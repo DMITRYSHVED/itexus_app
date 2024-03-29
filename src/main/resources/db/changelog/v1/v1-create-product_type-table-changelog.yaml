@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1-4
+      author: Shved Dmitry
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: product_type
+      changes:
+        - createTable:
+            tableName: product_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  autoIncrement: true
+              - column:
+                  name: product_type_name
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: v1-5
+      author: Shved Dmitry
+      changes:
+        - loadData:
+            tableName: product_type
+            file: db/data/product_type-data.csv

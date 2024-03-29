@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1-10
+      author: Shved Dmitry
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: order_position_map
+      changes:
+        - createTable:
+            tableName: order_position_map
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                  autoIncrement: true
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: order_map_fk
+                    referencedTableName: order
+                    referencedColumnNames: id
+              - column:
+                  name: sell_position_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: position_order_fk
+                    referencedTableName: sell_position
+                    referencedColumnNames: id
