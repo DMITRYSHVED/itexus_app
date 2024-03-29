@@ -1,26 +1,27 @@
 package com.example.miracles_store.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "order_position_map")
-public class OrderPositionMap {
+@Table(name = "position_order")
+@IdClass(PositionOrderPK.class)
+public class PositionOrder {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @ManyToOne
     @JoinColumn(name = "sell_position_id")
     private SellPosition sellPosition;
 
+    @Id
     @ManyToOne
     @JoinColumn(name = "order_id")
     private Order order;
+
+    @Column
+    private int quantity;
 }

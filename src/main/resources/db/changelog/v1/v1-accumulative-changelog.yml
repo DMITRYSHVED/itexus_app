@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1-1
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-address-table-changelog.sql
+  - changeSet:
+      id: v1-2
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-users-table-changelog.sql
+  - changeSet:
+      id: v1-3
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-product_type-table-changelog.sql
+  - changeSet:
+      id: v1-4
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-product-table-changelog.sql
+  - changeSet:
+      id: v1-5
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-sell_position-table-changelog.sql
+  - changeSet:
+      id: v1-6
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-orders-table-changelog.sql
+  - changeSet:
+      id: v1-7
+      author: Dmitry Shved
+      changes:
+        - sqlFile:
+            path: db/changelog/v1/v1-create-position_order-table-changelog.sql
