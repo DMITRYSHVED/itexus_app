@@ -1,0 +1,8 @@
+spring:
+    application:
+        name: miracles_store
+    jpa:
+        hibernate:
+            ddl-auto: validate
+    liquibase:
+        change-log: db/changelog/main-changelog.yml
