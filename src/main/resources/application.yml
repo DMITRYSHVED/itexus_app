@@ -6,5 +6,3 @@ spring:
             ddl-auto: validate
     liquibase:
         change-log: db/changelog/main-changelog.yml
-    profiles:
-        active: local

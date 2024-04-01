@@ -1,3 +1,5 @@
+--liquibase formatted sql
+--changeset Dmitry Shved:initial-tables-6
 CREATE TABLE position_order
 (
     order_id         INT,

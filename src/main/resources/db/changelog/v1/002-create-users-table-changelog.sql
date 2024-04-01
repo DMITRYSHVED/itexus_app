@@ -1,3 +1,5 @@
+--liquibase formatted sql
+--changeset Dmitry Shved:initial-tables-1
 CREATE TABLE users
 (
     id         SERIAL PRIMARY KEY,

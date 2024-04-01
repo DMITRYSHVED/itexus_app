@@ -1,7 +1,15 @@
 package com.example.miracles_store.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter
@@ -9,7 +17,7 @@ import lombok.*;
 @NoArgsConstructor
 @Entity
 @Table(name = "position_order")
-@IdClass(PositionOrderPK.class)
+@IdClass(PositionOrderId.class)
 public class PositionOrder {
 
     @Id
@@ -22,6 +30,5 @@ public class PositionOrder {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    @Column
     private int quantity;
 }

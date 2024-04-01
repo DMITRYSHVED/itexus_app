@@ -1,3 +1,5 @@
+--liquibase formatted sql
+--changeset Dmitry Shved:initial-tables-4
 CREATE TABLE sell_position
 (
     id         SERIAL PRIMARY KEY,

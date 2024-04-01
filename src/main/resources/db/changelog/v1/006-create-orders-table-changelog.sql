@@ -1,3 +1,5 @@
+--liquibase formatted sql
+--changeset Dmitry Shved:initial-tables-5
 CREATE TABLE orders
 (
     id            SERIAL PRIMARY KEY,

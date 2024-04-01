@@ -1,3 +1,5 @@
+--liquibase formatted sql
+--changeset Dmitry Shved:initial-tables-3
 CREATE TABLE product
 (
     id              SERIAL PRIMARY KEY,

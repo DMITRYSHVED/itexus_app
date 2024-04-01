@@ -1,3 +1,5 @@
+--liquibase formatted sql
+--changeset Dmitry Shved:initial-tables-0
 CREATE TABLE address
 (
     id       SERIAL PRIMARY KEY,
