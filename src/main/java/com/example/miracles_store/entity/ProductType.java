@@ -22,5 +22,13 @@ public class ProductType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    private String productTypeName;
+    private String name;
+
+    @Override
+    public String toString() {
+        return "ProductType{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }
