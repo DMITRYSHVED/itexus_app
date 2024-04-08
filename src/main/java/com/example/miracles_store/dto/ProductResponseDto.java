@@ -1,17 +1,15 @@
 package com.example.miracles_store.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.math.BigDecimal;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-public class ProductReadDto {
+public class ProductResponseDto {
 
-    private int id;
+    private Integer id;
 
     private String name;
 
@@ -19,5 +17,5 @@ public class ProductReadDto {
 
     private BigDecimal cost;
 
-    private String productTypeName;
+    private ProductTypeDto productType;
 }

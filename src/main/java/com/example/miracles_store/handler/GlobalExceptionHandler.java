@@ -1,14 +1,13 @@
 package com.example.miracles_store.handler;
 
-import com.example.miracles_store.exception.DuplicateEntityException;
-import com.example.miracles_store.exception.NoSuchEntityException;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,29 +19,20 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReferencedEntityException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String referencedExceptionInfo(ReferencedEntityException exception) {
-        return exception.getMessage();
+    public ResponseEntity<String> referencedExceptionInfo(ReferencedEntityException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(DuplicateEntityException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String duplicateEntityExceptionInfo(DuplicateEntityException exception) {
-        return exception.getMessage();
-    }
-
-    @ExceptionHandler(NoSuchEntityException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String noSuchEntityExceptionInfo(NoSuchEntityException exception) {
-        return exception.getMessage();
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> responseStatusExceptionInfo(ResponseStatusException exception) {
+        return new ResponseEntity<>(exception.getMessage(),exception.getStatusCode());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, List<String>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult().getFieldErrors()
-                .stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-        return (getErrorsMap(errors));
+    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult().getAllErrors()
+                .stream().map(ObjectError::getDefaultMessage).collect(Collectors.toList());
+        return new ResponseEntity<>(getErrorsMap(errors), HttpStatus.BAD_REQUEST);
     }
 
     private Map<String, List<String>> getErrorsMap(List<String> errors) {

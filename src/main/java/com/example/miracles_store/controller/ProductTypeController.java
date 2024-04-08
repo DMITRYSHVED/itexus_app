@@ -1,12 +1,16 @@
 package com.example.miracles_store.controller;
 
 import com.example.miracles_store.dto.ProductTypeDto;
-import com.example.miracles_store.entity.ProductType;
 import com.example.miracles_store.mapper.ProductTypeMapper;
 import com.example.miracles_store.service.ProductTypeService;
-import jakarta.validation.Valid;
+import com.example.miracles_store.validator.group.CreateAction;
+import com.example.miracles_store.validator.group.UpdateAction;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,9 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -27,37 +30,44 @@ public class ProductTypeController {
 
     private final ProductTypeService productTypeService;
 
+    private final ProductTypeMapper productTypeMapper;
+
     @GetMapping
-    public List<ProductTypeDto> getAll() {
-        return productTypeService.getAll();
+    public ResponseEntity<List<ProductTypeDto>> getAll(@RequestParam(name = "key", required = false) Integer key,
+                                                       @RequestParam(name = "size", required = false) Integer size,
+                                                       Pageable pageable) {
+        List<ProductTypeDto> response = productTypeService.getAll(key, pageable).getContent().stream()
+                .map(productTypeMapper::toDto)
+                .toList();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ProductTypeDto getById(@PathVariable("id") int id) {
-        ProductType productType = productTypeService.getById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ProductTypeMapper.INSTANCE.toDto(productType);
+    public ResponseEntity<ProductTypeDto> getById(@PathVariable("id") Integer id) {
+        ProductTypeDto response = productTypeMapper.toDto(productTypeService.getById(id));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProductTypeDto create(@RequestBody @Valid ProductTypeDto productTypeDto) {
-        return productTypeService.create(productTypeDto);
+    public ResponseEntity<ProductTypeDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
+                                                     ProductTypeDto productTypeDto) {
+        ProductTypeDto response = productTypeMapper.toDto(productTypeService.
+                create(productTypeMapper.toProductType(productTypeDto)));
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ProductTypeDto update(@PathVariable("id") int id,
-                                 @RequestBody @Valid ProductTypeDto productTypeDto) {
-        ProductType productType = productTypeService.update(id, productTypeDto).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ProductTypeMapper.INSTANCE.toDto(productType);
+    @PutMapping
+    public ResponseEntity<ProductTypeDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
+                                                     ProductTypeDto productTypeDto) {
+        ProductTypeDto response = productTypeMapper.toDto(productTypeService.
+                update(productTypeMapper.toProductType(productTypeDto)));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") int id) {
-        if (!productTypeService.deleteById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<String> delete(@PathVariable("id") Integer id) {
+        String response = "Product deleted";
+        productTypeService.deleteById(id);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

@@ -1,80 +1,61 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.dto.ProductTypeDto;
 import com.example.miracles_store.entity.ProductType;
-import com.example.miracles_store.exception.DuplicateEntityException;
 import com.example.miracles_store.exception.ReferencedEntityException;
-import com.example.miracles_store.mapper.ProductTypeMapper;
 import com.example.miracles_store.repository.ProductRepository;
 import com.example.miracles_store.repository.ProductTypeRepository;
+import com.example.miracles_store.repository.QueryProductTypeRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class ProductTypeService {
 
     private final ProductTypeRepository productTypeRepository;
-
-
+    private final QueryProductTypeRepository queryProductTypeRepository;
     private final ProductRepository productRepository;
 
-    public Optional<ProductType> getById(int id) {
-        return productTypeRepository.findById(id);
+    public ProductType getById(Integer id) {
+        return productTypeRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't find productType with id: " + id));
     }
 
-    public List<ProductTypeDto> getAll() {
-        return productTypeRepository.findAll().stream().
-                map(ProductTypeMapper.INSTANCE::toDto).toList();
-    }
+    public Page<ProductType> getAll(Integer key, Pageable pageable) {
+        Page<ProductType> productsPage;
 
-    @Transactional
-    public ProductTypeDto create(ProductTypeDto productTypeDto) {
-        ProductType saveProductType;
-
-        if (productTypeRepository.findByName(productTypeDto.getName()).isPresent()) {
-            throw new DuplicateEntityException("ProductType '" +
-                    productTypeDto.getName() + "' already exists.");
-        }
-        saveProductType = ProductTypeMapper.INSTANCE.toProductType(productTypeDto);
-        productTypeRepository.save(saveProductType);
-        return ProductTypeMapper.INSTANCE.toDto(saveProductType);
-    }
-
-    @Transactional
-    public Optional<ProductType> update(int id, ProductTypeDto productTypeDto) {
-        Optional<ProductType> optionalProductType;
-
-        if (productTypeRepository.findByName(productTypeDto.getName()).isPresent()) {
-            throw new DuplicateEntityException("ProductType '" +
-                    productTypeDto.getName() + "' already exists.");
-        }
-        optionalProductType = productTypeRepository.findById(id);
-        if (optionalProductType.isPresent()) {
-            ProductType productType = optionalProductType.get();
-            productType.setName(productTypeDto.getName());
-            return Optional.of(productType);
+        if (key != null) {
+            productsPage = queryProductTypeRepository.findAllPage(key, pageable);
         } else {
-            return Optional.empty();
+            productsPage = productTypeRepository.findAll(pageable);
         }
+        return productsPage;
     }
 
-    @Transactional
-    public boolean deleteById(int id) {
-        return productTypeRepository.findById(id).map(productType -> {
-                    if (productRepository.findByProductType(productType).isEmpty()) {
-                    throw new ReferencedEntityException("Can't delete type '" +
-                            productType.getName() + "' due to existing products of the same type");
-                    } else {
-                        productTypeRepository.deleteById(id);
-                        return true;
-                    }
-                })
-                .orElse(false);
+    public ProductType create(ProductType productType) {
+        return productTypeRepository.save(productType);
+    }
+
+    public ProductType update(ProductType productType) {
+        ProductType updateProductType = getById(productType.getId());
+
+        updateProductType.setName(productType.getName());
+        return updateProductType;
+    }
+
+    public void deleteById(Integer id) {
+        ProductType productType = getById(id);
+
+        if (productRepository.existsByProductType(productType)) {
+            throw new ReferencedEntityException("Can't delete type '" +
+                    productType.getName() + "' due to existing products of this type");
+        }
+        productTypeRepository.deleteById(id);
     }
 }

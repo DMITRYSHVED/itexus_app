@@ -1,15 +1,17 @@
 package com.example.miracles_store.controller;
 
-import com.example.miracles_store.dto.ProductCreateEditDto;
-import com.example.miracles_store.dto.ProductReadDto;
-import com.example.miracles_store.entity.Product;
-import com.example.miracles_store.entity.ProductType;
+import com.example.miracles_store.dto.ProductRequestDto;
+import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.mapper.ProductMapper;
 import com.example.miracles_store.service.ProductService;
-import com.example.miracles_store.service.ProductTypeService;
-import jakarta.validation.Valid;
+import com.example.miracles_store.validator.group.CreateAction;
+import com.example.miracles_store.validator.group.UpdateAction;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -31,49 +31,44 @@ public class ProductController {
 
     private final ProductService productService;
 
-    private final ProductTypeService productTypeService;
-
+    private final ProductMapper productMapper;
 
     @GetMapping
-    public List<ProductReadDto> getAll(@RequestParam(name = "key", required = false) Integer key,
-                                       @RequestParam(name = "size", defaultValue = "10") int size) {
-        return productService.getAll(key, size);
+    public ResponseEntity<List<ProductResponseDto>> getAll(@RequestParam(name = "key", required = false) Integer key,
+                                                           @RequestParam(name = "size", required = false) Integer size,
+                                                           @RequestParam(name = "type", required = false) String type,
+                                                           Pageable pageable) {
+        List<ProductResponseDto> response = productService.getAll(key, type, pageable).getContent().stream()
+                .map(productMapper::toResponseDto).toList();
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
 
     @GetMapping("/{id}")
-    public ProductReadDto getById(@PathVariable("id") int id) {
-        Product product = productService.getById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ProductMapper.INSTANCE.toReadDto(product);
-    }
-
-    @GetMapping("/byProductType/{productTypeId}")
-    public List<ProductReadDto> getByProductType(@PathVariable("productTypeId") int id) {
-        ProductType productType = productTypeService.getById(id).
-                orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return productService.getProductsByProductType(productType);
+    public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") Integer id) {
+        ProductResponseDto response = productMapper.toResponseDto(productService.getById(id));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public ProductReadDto create(@RequestBody @Valid ProductCreateEditDto productCreateEditDto) {
-        return productService.create(productCreateEditDto);
+    public ResponseEntity<ProductResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
+                                                         ProductRequestDto product) {
+        ProductResponseDto response = productMapper.toResponseDto(productService.
+                create(productMapper.requestDtoToProduct(product)));
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ProductReadDto update(@PathVariable("id") int id,
-                                 @RequestBody @Valid ProductCreateEditDto productCreateEditDto) {
-        Product product = productService.update(id, productCreateEditDto).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return ProductMapper.INSTANCE.toReadDto(product);
+    @PutMapping
+    public ResponseEntity<ProductResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
+                                                         ProductRequestDto productCreateEditDto) {
+        ProductResponseDto response = productMapper.toResponseDto(productService.
+                update(productMapper.requestDtoToProduct(productCreateEditDto)));
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") int id) {
-        if (!productService.deleteById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
+    public ResponseEntity<String> delete(@PathVariable("id") Integer id) {
+        productService.deleteById(id);
+        String response = "Product deleted";
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

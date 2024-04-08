@@ -23,12 +23,4 @@ public class ProductType {
     private int id;
 
     private String name;
-
-    @Override
-    public String toString() {
-        return "ProductType{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }

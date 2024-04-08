@@ -6,7 +6,7 @@ CREATE TABLE orders
     phone         VARCHAR(20) NOT NULL,
     order_comment VARCHAR(255),
     order_status  VARCHAR(50) NOT NULL,
-    sum           DECIMAL     NOT NULL,
+    sum           MONEY        NOT NULL,
     address_id    INT,
     user_id       INT,
     FOREIGN KEY (address_id) REFERENCES address (id),

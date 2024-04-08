@@ -1,101 +1,67 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.dto.ProductCreateEditDto;
-import com.example.miracles_store.dto.ProductReadDto;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.ProductType;
-import com.example.miracles_store.exception.DuplicateEntityException;
-import com.example.miracles_store.exception.NoSuchEntityException;
-import com.example.miracles_store.mapper.ProductMapper;
 import com.example.miracles_store.repository.ProductRepository;
+import com.example.miracles_store.repository.QueryProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final QueryProductRepository queryProductRepository;
 
     private final ProductTypeService productTypeService;
 
-    public Optional<Product> getById(int id) {
-        return productRepository.findById(id);
+    public Product getById(Integer id) {
+        return productRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't find product with id: " + id));
     }
 
-    public List<ProductReadDto> getAll(Integer key, int size) {
+    public Page<Product> getAll(Integer key, String type, Pageable pageable) {
         Page<Product> productsPage;
+
         if (key != null) {
-            productsPage = productRepository.findByIdGreaterThanOrderByIdAsc(key, PageRequest.of(0, size));
+            productsPage = queryProductRepository.findAllPage(key, pageable);
         } else {
-            productsPage = productRepository.findAll(PageRequest.of(0, size));
+            if (type != null) {
+                productsPage = productRepository.findByProductTypeName(type, pageable);
+            } else {
+                productsPage = productRepository.findAll(pageable);
+            }
         }
-        return productsPage.getContent().stream()
-                .map(ProductMapper.INSTANCE::toReadDto)
-                .toList();
+        return productsPage;
     }
 
-    @Transactional
-    public ProductReadDto create(ProductCreateEditDto productCreateEditDto) {
-        Optional<ProductType> saveProductType = productTypeService.getById(productCreateEditDto.getProductTypeId());
+    public Product create(Product product) {
+        ProductType saveProductType = productTypeService.getById(product.getProductType().getId());
 
-        if (productRepository.findByName(productCreateEditDto.getName()).isPresent()) {
-            throw new DuplicateEntityException("Product with name '" +
-                    productCreateEditDto.getName() + "' already exists.");
-        }
-        if (saveProductType.isPresent()) {
-            Product saveProduct = ProductMapper.INSTANCE.toProduct(productCreateEditDto);
-            saveProduct.setProductType(saveProductType.get());
-            productRepository.save(saveProduct);
-            return ProductMapper.INSTANCE.toReadDto(saveProduct);
-        } else {
-            throw new NoSuchEntityException("The product type with the specified identifier was not found.");
-        }
+        product.setProductType(saveProductType);
+        return productRepository.save(product);
     }
 
 
-    @Transactional
-    public Optional<Product> update(int id, ProductCreateEditDto productCreateEditDto) {
-        Optional<Product> optionalProduct;
-        Optional<ProductType> optionalProductType;
+    public Product update(Product product) {
+        Product updateProduct = getById(product.getId());
+        ProductType productType = productTypeService.getById(product.getProductType().getId());
 
-        if (productRepository.findByName(productCreateEditDto.getName()).isPresent()) {
-            throw new DuplicateEntityException("Product with name '" +
-                    productCreateEditDto.getName() + "' already exists.");
-        }
-        optionalProduct = productRepository.findById(id);
-        optionalProductType = productTypeService.getById(productCreateEditDto.getProductTypeId());
-        if (optionalProduct.isPresent() && optionalProductType.isPresent()) {
-            Product product = optionalProduct.get();
-            product.setName(productCreateEditDto.getName());
-            product.setCost(productCreateEditDto.getCost());
-            product.setDescription(productCreateEditDto.getDescription());
-            product.setProductType(optionalProductType.get());
-            Product updatedProduct = productRepository.saveAndFlush(product);
-            return Optional.of(updatedProduct);
-        } else {
-            return Optional.empty();
-        }
+        updateProduct.setName(product.getName());
+        updateProduct.setCost(product.getCost());
+        updateProduct.setDescription(product.getDescription());
+        updateProduct.setProductType(productType);
+        return productRepository.saveAndFlush(updateProduct);
     }
 
-    @Transactional
-    public boolean deleteById(int id) {
-        return productRepository.findById(id).map(product -> {
-                    productRepository.deleteById(id);
-                    return true;
-                })
-                .orElse(false);
-    }
-
-    public List<ProductReadDto> getProductsByProductType(ProductType productType) {
-        return productRepository.findByProductType(productType).stream().
-                map(ProductMapper.INSTANCE::toReadDto).toList();
+    public void deleteById(int id) {
+        productRepository.deleteById(id);
     }
 }
