@@ -1,14 +1,18 @@
 package com.example.miracles_store.controller;
 
+import com.example.miracles_store.dto.ProductFilter;
 import com.example.miracles_store.dto.ProductRequestDto;
 import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.mapper.ProductMapper;
 import com.example.miracles_store.service.ProductService;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,11 +23,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "product_controller")
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -34,11 +38,10 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAll(@RequestParam(name = "key", required = false) Integer key,
-                                                           @RequestParam(name = "size", required = false) Integer size,
-                                                           @RequestParam(name = "type", required = false) String type,
-                                                           Pageable pageable) {
-        List<ProductResponseDto> response = productService.getAll(key, type, pageable).getContent().stream()
+    public ResponseEntity<List<ProductResponseDto>> getAll(ProductFilter productFilter,
+                                                           @PageableDefault(size = 10, sort = {"id"},
+                                                                   direction = Sort.Direction.ASC) Pageable pageable) {
+        List<ProductResponseDto> response = productService.getAll(productFilter, pageable).getContent().stream()
                 .map(productMapper::toResponseDto).toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -51,7 +54,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
-                                                         ProductRequestDto product) {
+                                                     ProductRequestDto product) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
                 create(productMapper.requestDtoToProduct(product)));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -59,7 +62,7 @@ public class ProductController {
 
     @PutMapping
     public ResponseEntity<ProductResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
-                                                         ProductRequestDto productCreateEditDto) {
+                                                     ProductRequestDto productCreateEditDto) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
                 update(productMapper.requestDtoToProduct(productCreateEditDto)));
         return new ResponseEntity<>(response, HttpStatus.OK);

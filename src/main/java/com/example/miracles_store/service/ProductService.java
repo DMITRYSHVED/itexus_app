@@ -1,9 +1,10 @@
 package com.example.miracles_store.service;
 
+import com.example.miracles_store.dto.ProductFilter;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.ProductType;
 import com.example.miracles_store.repository.ProductRepository;
-import com.example.miracles_store.repository.QueryProductRepository;
+import com.example.miracles_store.repository.querydsl.QPredicates;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,14 +13,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import static com.example.miracles_store.entity.QProduct.product;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final QueryProductRepository queryProductRepository;
-
     private final ProductTypeService productTypeService;
 
     public Product getById(Integer id) {
@@ -27,19 +28,14 @@ public class ProductService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't find product with id: " + id));
     }
 
-    public Page<Product> getAll(Integer key, String type, Pageable pageable) {
-        Page<Product> productsPage;
+    public Page<Product> getAll(ProductFilter filter, Pageable pageable) {
+        var predicate = QPredicates.builder()
+                .add(filter.name(), product.name::containsIgnoreCase)
+                .add(filter.cost(), product.cost::in)
+                .add(filter.productTypeId(), product.productType.id::in)
+                .build();
 
-        if (key != null) {
-            productsPage = queryProductRepository.findAllPage(key, pageable);
-        } else {
-            if (type != null) {
-                productsPage = productRepository.findByProductTypeName(type, pageable);
-            } else {
-                productsPage = productRepository.findAll(pageable);
-            }
-        }
-        return productsPage;
+        return productRepository.findAll(predicate, pageable);
     }
 
     public Product create(Product product) {
@@ -48,7 +44,6 @@ public class ProductService {
         product.setProductType(saveProductType);
         return productRepository.save(product);
     }
-
 
     public Product update(Product product) {
         Product updateProduct = getById(product.getId());

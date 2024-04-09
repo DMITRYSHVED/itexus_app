@@ -4,7 +4,6 @@ import com.example.miracles_store.entity.ProductType;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import com.example.miracles_store.repository.ProductRepository;
 import com.example.miracles_store.repository.ProductTypeRepository;
-import com.example.miracles_store.repository.QueryProductTypeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +18,6 @@ import org.springframework.web.server.ResponseStatusException;
 public class ProductTypeService {
 
     private final ProductTypeRepository productTypeRepository;
-    private final QueryProductTypeRepository queryProductTypeRepository;
     private final ProductRepository productRepository;
 
     public ProductType getById(Integer id) {
@@ -27,15 +25,8 @@ public class ProductTypeService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't find productType with id: " + id));
     }
 
-    public Page<ProductType> getAll(Integer key, Pageable pageable) {
-        Page<ProductType> productsPage;
-
-        if (key != null) {
-            productsPage = queryProductTypeRepository.findAllPage(key, pageable);
-        } else {
-            productsPage = productTypeRepository.findAll(pageable);
-        }
-        return productsPage;
+    public Page<ProductType> getAll(Pageable pageable) {
+        return productTypeRepository.findAll(pageable);
     }
 
     public ProductType create(ProductType productType) {
