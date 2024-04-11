@@ -1,5 +1,6 @@
 package com.example.miracles_store.handler;
 
+import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +8,6 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,9 +23,9 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<String> responseStatusExceptionInfo(ResponseStatusException exception) {
-        return new ResponseEntity<>(exception.getMessage(),exception.getStatusCode());
+    @ExceptionHandler(ObjectNotFoundException.class)
+    public ResponseEntity<String> objectNotFoundExceptionInfo(ObjectNotFoundException exception) {
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

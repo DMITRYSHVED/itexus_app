@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -38,10 +38,10 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAll(ProductFilter productFilter,
-                                                           @PageableDefault(size = 10, sort = {"id"},
-                                                                   direction = Sort.Direction.ASC) Pageable pageable) {
-        List<ProductResponseDto> response = productService.getAll(productFilter, pageable).getContent().stream()
+    public ResponseEntity<List<ProductResponseDto>> getAll(@RequestParam(required = false) Integer key,
+                                                           ProductFilter productFilter,
+                                                           @PageableDefault(size = 10, sort = "id") Pageable pageable) {
+        List<ProductResponseDto> response = productService.getAll(key,productFilter, pageable).getContent().stream()
                 .map(productMapper::toResponseDto).toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -56,7 +56,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                      ProductRequestDto product) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
-                create(productMapper.requestDtoToProduct(product)));
+                save(productMapper.requestDtoToProduct(product)));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -69,9 +69,9 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable("id") Integer id) {
+    public ResponseEntity delete(@PathVariable("id") Integer id) {
         productService.deleteById(id);
         String response = "Product deleted";
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

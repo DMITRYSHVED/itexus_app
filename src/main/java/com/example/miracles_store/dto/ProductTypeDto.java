@@ -1,6 +1,6 @@
 package com.example.miracles_store.dto;
 
-import com.example.miracles_store.validator.UniqueProductType;
+import com.example.miracles_store.validator.UniqueProductTypeName;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
 import jakarta.validation.constraints.NotBlank;
@@ -12,7 +12,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-@UniqueProductType
+@UniqueProductTypeName
 public class ProductTypeDto {
 
     @NotNull(groups = UpdateAction.class)

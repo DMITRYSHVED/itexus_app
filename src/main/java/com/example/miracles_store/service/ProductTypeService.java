@@ -1,16 +1,17 @@
 package com.example.miracles_store.service;
 
 import com.example.miracles_store.entity.ProductType;
+import com.example.miracles_store.entity.QProductType;
+import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import com.example.miracles_store.repository.ProductRepository;
 import com.example.miracles_store.repository.ProductTypeRepository;
+import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -22,30 +23,33 @@ public class ProductTypeService {
 
     public ProductType getById(Integer id) {
         return productTypeRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Can't find productType with id: " + id));
+                () -> new ObjectNotFoundException("Can't find productType with id: " + id));
     }
 
-    public Page<ProductType> getAll(Pageable pageable) {
-        return productTypeRepository.findAll(pageable);
+    public Page<ProductType> getAll(Integer key, Pageable pageable) {
+        QProductType qProductType = QProductType.productType;
+        BooleanBuilder predicate = new BooleanBuilder();
+
+        if (key != null) {
+            predicate.and(qProductType.id.gt(key));
+        }
+        return productTypeRepository.findAll(predicate,pageable);
     }
 
-    public ProductType create(ProductType productType) {
+    public ProductType save(ProductType productType) {
         return productTypeRepository.save(productType);
     }
 
     public ProductType update(ProductType productType) {
-        ProductType updateProductType = getById(productType.getId());
-
-        updateProductType.setName(productType.getName());
-        return updateProductType;
+        return productTypeRepository.saveAndFlush(productType);
     }
 
     public void deleteById(Integer id) {
         ProductType productType = getById(id);
 
         if (productRepository.existsByProductType(productType)) {
-            throw new ReferencedEntityException("Can't delete type '" +
-                    productType.getName() + "' due to existing products of this type");
+            throw new ReferencedEntityException(String.
+                    format("Can't delete type '%s' due to existing products of this type", productType.getName()));
         }
         productTypeRepository.deleteById(id);
     }

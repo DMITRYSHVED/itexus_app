@@ -7,22 +7,24 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
+
 @Component
 @RequiredArgsConstructor
-public class UniqueProductValidator implements ConstraintValidator<UniqueProduct, ProductRequestDto> {
-
+public class UniqueProductNameValidator implements ConstraintValidator<UniqueProductName, ProductRequestDto> {
     private final ProductRepository productRepository;
 
     @Override
     public boolean isValid(ProductRequestDto product, ConstraintValidatorContext context) {
-        if (productRepository.existsByName(product.getName())) {
-            if (product.getId() != null) {
-                return productRepository.findByName(product.getName()).get().getId() == product.getId();
+        if (Objects.nonNull(product.getId())) {
+            if (productRepository.existsByNameAndId(product.getName(), product.getId())) {
+                return true;
             } else {
-                return false;
+                return !productRepository.existsByName(product.getName());
             }
         } else {
-            return true;
+            return !productRepository.existsByName(product.getName());
         }
     }
 }

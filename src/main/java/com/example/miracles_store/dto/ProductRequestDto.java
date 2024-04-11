@@ -1,7 +1,7 @@
 package com.example.miracles_store.dto;
 
 import com.example.miracles_store.validator.ProductTypeIdExists;
-import com.example.miracles_store.validator.UniqueProduct;
+import com.example.miracles_store.validator.UniqueProductName;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-@UniqueProduct
+@UniqueProductName
 public class ProductRequestDto {
 
     @NotNull(groups = UpdateAction.class)

@@ -10,11 +10,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = {UniqueProductTypeValidator.class})
+@Constraint(validatedBy = {UniqueProductTypeNameValidator.class})
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UniqueProductType {
-    String message() default "ProductType with this name already exists";
+public @interface UniqueProductTypeName {
+    String message() default "Product type with this name already exists";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }
