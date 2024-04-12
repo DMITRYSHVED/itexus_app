@@ -1,5 +1,6 @@
 package com.example.miracles_store.dto;
 
+import com.example.miracles_store.validator.ProductIdExists;
 import com.example.miracles_store.validator.ProductTypeIdExists;
 import com.example.miracles_store.validator.UniqueProductName;
 import com.example.miracles_store.validator.group.CreateAction;
@@ -20,6 +21,7 @@ import java.math.BigDecimal;
 public class ProductRequestDto {
 
     @NotNull(groups = UpdateAction.class)
+    @ProductIdExists(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     private Integer id;
 

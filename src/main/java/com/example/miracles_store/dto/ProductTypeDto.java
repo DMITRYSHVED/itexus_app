@@ -1,5 +1,6 @@
 package com.example.miracles_store.dto;
 
+import com.example.miracles_store.validator.ProductTypeIdExists;
 import com.example.miracles_store.validator.UniqueProductTypeName;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
@@ -16,6 +17,7 @@ import lombok.Data;
 public class ProductTypeDto {
 
     @NotNull(groups = UpdateAction.class)
+    @ProductTypeIdExists(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     private Integer id;
 

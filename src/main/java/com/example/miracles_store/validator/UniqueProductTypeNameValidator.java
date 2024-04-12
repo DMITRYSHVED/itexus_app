@@ -15,11 +15,11 @@ public class UniqueProductTypeNameValidator implements ConstraintValidator<Uniqu
     private final ProductTypeRepository productTypeRepository;
 
     @Override
-    public boolean isValid(ProductTypeDto productTypeDto, ConstraintValidatorContext context) {
-        if (Objects.nonNull(productTypeDto.getId())) {
-            return !productTypeRepository.existsByNameAndIdNotEqual(productTypeDto.getName(), productTypeDto.getId());
+    public boolean isValid(ProductTypeDto productType, ConstraintValidatorContext context) {
+        if (Objects.nonNull(productType.getId())) {
+            return !productTypeRepository.existsByNameAndIdNotEqual(productType.getName(), productType.getId());
         } else {
-            return !productTypeRepository.existsByName(productTypeDto.getName());
+            return !productTypeRepository.existsByName(productType.getName());
         }
     }
 }
