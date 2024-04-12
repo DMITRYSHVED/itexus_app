@@ -14,11 +14,11 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
     QProduct qProduct = QProduct.product;
 
     default Boolean existsByName(String name) {
-        return exists(qProduct.name.eq(name));
+        return exists(qProduct.name.containsIgnoreCase(name));
     }
 
     default Boolean existsByNameAndIdNotEqual(String name, Integer id) {
-        BooleanBuilder predicate = new BooleanBuilder(qProduct.name.eq(name));
+        BooleanBuilder predicate = new BooleanBuilder(qProduct.name.containsIgnoreCase(name));
 
         predicate.and(qProduct.id.ne(id));
         return exists(predicate);
