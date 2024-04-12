@@ -23,14 +23,14 @@ public class SellPosition {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     private String size;
 
-    private int quantity;
+    private Integer quantity;
 
     @Column(name = "active")
-    private boolean isActive;
+    private Boolean isActive;
 
     @ManyToOne
     @JoinColumn(name = "product_id")

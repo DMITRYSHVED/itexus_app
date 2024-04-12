@@ -17,10 +17,10 @@ public interface ProductRepository extends JpaRepository<Product, Integer>, Quer
         return exists(qProduct.name.eq(name));
     }
 
-    default Boolean existsByNameAndId(String name, Integer id) {
+    default Boolean existsByNameAndIdNotEqual(String name, Integer id) {
         BooleanBuilder predicate = new BooleanBuilder(qProduct.name.eq(name));
 
-        predicate.and(qProduct.id.eq(id));
+        predicate.and(qProduct.id.ne(id));
         return exists(predicate);
     }
 

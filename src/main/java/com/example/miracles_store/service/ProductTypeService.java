@@ -1,12 +1,10 @@
 package com.example.miracles_store.service;
 
 import com.example.miracles_store.entity.ProductType;
-import com.example.miracles_store.entity.QProductType;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import com.example.miracles_store.repository.ProductRepository;
 import com.example.miracles_store.repository.ProductTypeRepository;
-import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,14 +24,10 @@ public class ProductTypeService {
                 () -> new ObjectNotFoundException("Can't find productType with id: " + id));
     }
 
-    public Page<ProductType> getAll(Integer key, Pageable pageable) {
-        QProductType qProductType = QProductType.productType;
-        BooleanBuilder predicate = new BooleanBuilder();
+    @Transactional(readOnly = true)
+    public Page<ProductType> getAll(Pageable pageable) {
 
-        if (key != null) {
-            predicate.and(qProductType.id.gt(key));
-        }
-        return productTypeRepository.findAll(predicate,pageable);
+        return productTypeRepository.findAll(pageable);
     }
 
     public ProductType save(ProductType productType) {
@@ -48,8 +42,8 @@ public class ProductTypeService {
         ProductType productType = getById(id);
 
         if (productRepository.existsByProductType(productType)) {
-            throw new ReferencedEntityException(String.
-                    format("Can't delete type '%s' due to existing products of this type", productType.getName()));
+            throw new ReferencedEntityException(String
+                    .format("Can't delete type '%s' due to existing products of this type", productType.getName()));
         }
         productTypeRepository.deleteById(id);
     }

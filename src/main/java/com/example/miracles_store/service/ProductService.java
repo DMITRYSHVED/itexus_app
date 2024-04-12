@@ -20,24 +20,22 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public Product getById(Integer id) {
-        return productRepository.findById(id).orElseThrow(
-                () -> new ObjectNotFoundException("Can't find product with id: " + id));
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Can't find product with id: " + id));
     }
 
-    public Page<Product> getAll(Integer key, ProductFilter filter, Pageable pageable) {
+    @Transactional(readOnly = true)
+    public Page<Product> getAll(ProductFilter filter, Pageable pageable) {
         QProduct qProduct = QProduct.product;
         BooleanBuilder predicate = new BooleanBuilder();
 
-        if (key != null) {
-            predicate.and(qProduct.id.gt(key));
-        }
-        if (filter.name()!=null) {
+        if (filter.name() != null) {
             predicate.and(qProduct.name.containsIgnoreCase(filter.name()));
         }
-        if (filter.cost()!=null) {
+        if (filter.cost() != null) {
             predicate.and(qProduct.cost.eq(filter.cost()));
         }
-        if (filter.productTypeId()!=null) {
+        if (filter.productTypeId() != null) {
             predicate.and(qProduct.productType.id.eq(filter.productTypeId()));
         }
         return productRepository.findAll(predicate, pageable);

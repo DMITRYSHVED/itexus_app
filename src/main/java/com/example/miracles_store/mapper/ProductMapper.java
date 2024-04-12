@@ -26,13 +26,12 @@ public abstract class ProductMapper {
     @Mapping(target = "productType", source = "product.productType", qualifiedByName = "fromTypeToTypeDto")
     public abstract ProductResponseDto toResponseDto(Product product);
 
-    @Mapping(source = "productTypeId", target = "productType")
+    @Mapping(target = "productType", source = "productTypeId")
     public abstract Product requestDtoToProduct(ProductRequestDto productCreateEditDto);
 
     @Named("fromTypeToTypeDto")
     protected ProductTypeDto fromTypeToTypeDto(ProductType productType) {
-        return productTypeMapper
-                .toDto(productType);
+        return productTypeMapper.toDto(productType);
     }
 
     protected ProductType fromTypeIdToType(Integer productTypeId) {

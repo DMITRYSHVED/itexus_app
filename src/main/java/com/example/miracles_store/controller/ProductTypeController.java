@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -36,11 +35,9 @@ public class ProductTypeController {
     private final ProductTypeMapper productTypeMapper;
 
     @GetMapping
-    public ResponseEntity<List<ProductTypeDto>> getAll(@RequestParam(required = false) Integer key,
-                                                       @PageableDefault(size = 10, sort = "id") Pageable pageable) {
-        List<ProductTypeDto> response = productTypeService.getAll(key, pageable).getContent().stream()
-                .map(productTypeMapper::toDto)
-                .toList();
+    public ResponseEntity<List<ProductTypeDto>> getAll(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        List<ProductTypeDto> response = productTypeService.getAll(pageable).getContent().stream()
+                .map(productTypeMapper::toDto).toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -53,22 +50,22 @@ public class ProductTypeController {
     @PostMapping
     public ResponseEntity<ProductTypeDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                  ProductTypeDto productTypeDto) {
-        ProductTypeDto response = productTypeMapper.toDto(productTypeService.
-                save(productTypeMapper.toEntity(productTypeDto)));
+        ProductTypeDto response = productTypeMapper.toDto(productTypeService
+                .save(productTypeMapper.toEntity(productTypeDto)));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<ProductTypeDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
                                                  ProductTypeDto productTypeDto) {
-        ProductTypeDto response = productTypeMapper.toDto(productTypeService.
-                update(productTypeMapper.toEntity(productTypeDto)));
+        ProductTypeDto response = productTypeMapper.toDto(productTypeService
+                .update(productTypeMapper.toEntity(productTypeDto)));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity delete(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> delete(@PathVariable("id") Integer id) {
         productTypeService.deleteById(id);
-        return new ResponseEntity(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
