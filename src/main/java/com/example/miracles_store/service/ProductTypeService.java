@@ -19,6 +19,7 @@ public class ProductTypeService {
     private final ProductTypeRepository productTypeRepository;
     private final ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public ProductType getById(Integer id) {
         return productTypeRepository.findById(id).orElseThrow(
                 () -> new ObjectNotFoundException("Can't find productType with id: " + id));
