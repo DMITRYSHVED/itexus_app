@@ -15,6 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -25,11 +27,13 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     private String phone;
 
     private String orderComment;
+
+    private BigDecimal sum;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
