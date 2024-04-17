@@ -1,5 +1,6 @@
-package com.example.miracles_store.validator;
+package com.example.miracles_store.validator.annotation;
 
+import com.example.miracles_store.validator.UniqueSellPositionValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -10,11 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = {UniqueProductNameValidator.class})
+@Constraint(validatedBy = {UniqueSellPositionValidator.class})
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UniqueProductName {
-    String message() default "Product with this name already exists";
+public @interface UniqueSellPosition {
+    String message() default "This sellPosition already exists";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

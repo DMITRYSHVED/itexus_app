@@ -1,4 +1,4 @@
-package com.example.miracles_store.dto;
+package com.example.miracles_store.dto.filter;
 
 import java.math.BigDecimal;
 

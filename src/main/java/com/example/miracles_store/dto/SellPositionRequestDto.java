@@ -1,42 +1,40 @@
 package com.example.miracles_store.dto;
 
 import com.example.miracles_store.validator.annotation.ProductIdExists;
-import com.example.miracles_store.validator.annotation.ProductTypeIdExists;
-import com.example.miracles_store.validator.annotation.UniqueProductName;
+import com.example.miracles_store.validator.annotation.SellPositionIdExists;
+import com.example.miracles_store.validator.annotation.UniqueSellPosition;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
 @AllArgsConstructor
-@UniqueProductName
-public class ProductRequestDto {
+@UniqueSellPosition
+public class SellPositionRequestDto {
 
     @NotNull(groups = UpdateAction.class)
-    @ProductIdExists(groups = UpdateAction.class)
+    @SellPositionIdExists(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     private Integer id;
 
-    @NotBlank
-    @Size(max = 250)
-    private String name;
+    @NotNull
+    @ProductIdExists
+    private Integer productId;
 
     @NotBlank
-    private String description;
+    @Size(max = 50)
+    private String size;
 
     @NotNull
-    @Positive
-    private BigDecimal cost;
+    @PositiveOrZero
+    private Integer quantity;
 
     @NotNull
-    @ProductTypeIdExists
-    private Integer productTypeId;
+    private Boolean isActive;
 }

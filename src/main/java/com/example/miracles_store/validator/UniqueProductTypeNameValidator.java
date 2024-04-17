@@ -2,6 +2,7 @@ package com.example.miracles_store.validator;
 
 import com.example.miracles_store.dto.ProductTypeDto;
 import com.example.miracles_store.repository.ProductTypeRepository;
+import com.example.miracles_store.validator.annotation.UniqueProductTypeName;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;

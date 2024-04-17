@@ -1,6 +1,6 @@
 package com.example.miracles_store.controller;
 
-import com.example.miracles_store.dto.ProductFilter;
+import com.example.miracles_store.dto.filter.ProductFilter;
 import com.example.miracles_store.dto.ProductRequestDto;
 import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.mapper.ProductMapper;
@@ -60,9 +60,9 @@ public class ProductController {
 
     @PutMapping
     public ResponseEntity<ProductResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
-                                                     ProductRequestDto productCreateEditDto) {
+                                                     ProductRequestDto productRequestDto) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
-                update(productMapper.requestDtoToProduct(productCreateEditDto)));
+                update(productMapper.requestDtoToProduct(productRequestDto)));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -1,10 +1,12 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.dto.ProductFilter;
+import com.example.miracles_store.dto.filter.ProductFilter;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.QProduct;
 import com.example.miracles_store.exception.ObjectNotFoundException;
+import com.example.miracles_store.exception.ReferencedEntityException;
 import com.example.miracles_store.repository.ProductRepository;
+import com.example.miracles_store.repository.SellPositionRepository;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+
+    private final SellPositionRepository sellPositionRepository;
 
     @Transactional(readOnly = true)
     public Product getById(Integer id) {
@@ -51,6 +55,12 @@ public class ProductService {
     }
 
     public void deleteById(Integer id) {
+        Product product = getById(id);
+
+        if (sellPositionRepository.existsByProduct(product)) {
+            throw new ReferencedEntityException(String
+                    .format("Can't delete product '%s' due to existing products of this type", product.getName()));
+        }
         productRepository.deleteById(id);
     }
 }

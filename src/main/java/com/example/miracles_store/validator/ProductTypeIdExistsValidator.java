@@ -1,6 +1,7 @@
 package com.example.miracles_store.validator;
 
 import com.example.miracles_store.repository.ProductTypeRepository;
+import com.example.miracles_store.validator.annotation.ProductTypeIdExists;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
