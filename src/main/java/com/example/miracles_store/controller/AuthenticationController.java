@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,7 +43,7 @@ public class AuthenticationController {
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> update(@RequestBody @Validated PasswordChangeDto passwordChangeDto) {
+    public ResponseEntity<?> update(@RequestBody @Valid PasswordChangeDto passwordChangeDto) {
         authenticationService.updatePassword(userMapper
                 .passwordChangeDtoToUser(passwordChangeDto, userService.getById(passwordChangeDto.getUserId())));
         return ResponseEntity.status(HttpStatus.OK).build();

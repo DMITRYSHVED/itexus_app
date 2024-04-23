@@ -14,10 +14,6 @@ public interface UserRepository extends JpaRepository<User, Integer>, QuerydslPr
     QUser qUser = QUser.user;
 
     default Optional<User> findByEmail(String email) {
-        return findOne(qUser.email.eq(email));
-    }
-
-    default Boolean existsByEmail(String email) {
-        return exists(qUser.email.containsIgnoreCase(email));
+        return findOne(qUser.email.containsIgnoreCase(email));
     }
 }

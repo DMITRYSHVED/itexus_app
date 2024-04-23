@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper(componentModel = "spring")
+@Mapper
 public abstract class ProductMapper {
 
     @Autowired

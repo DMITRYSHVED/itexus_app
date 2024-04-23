@@ -23,8 +23,7 @@ public class CustomLogoutHandler implements LogoutHandler {
             return;
         }
         String token = authHeader.substring(7);
-        Token storedToken = new Token();
-        storedToken.setToken(token);
-        tokenRepository.save(storedToken);
+        long ttlInSeconds = 24 * 60 * 60;
+        tokenRepository.save(new Token(token, ttlInSeconds));
     }
 }

@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.springframework.stereotype.Component;
 
 @Component
-@Mapper(componentModel = "spring")
+@Mapper
 public interface ProductTypeMapper {
 
     ProductTypeDto toDto(ProductType productType);

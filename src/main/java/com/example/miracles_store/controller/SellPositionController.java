@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,12 +47,13 @@ public class SellPositionController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<SellPositionResponseDto> getById(@PathVariable Integer id) {
+    public ResponseEntity<SellPositionResponseDto> getById(@PathVariable("id") Integer id) {
         SellPositionResponseDto response = sellPositionMapper.toResponseDto(sellPositionService.getById(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SellPositionResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                           SellPositionRequestDto sellPosition) {
         SellPositionResponseDto response = sellPositionMapper.toResponseDto(sellPositionService.
@@ -60,6 +62,7 @@ public class SellPositionController {
     }
 
     @PutMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SellPositionResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
                                                           SellPositionRequestDto sellPosition) {
         SellPositionResponseDto response = sellPositionMapper.toResponseDto(sellPositionService
@@ -68,6 +71,7 @@ public class SellPositionController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
         sellPositionService.deleteById(id);
         return ResponseEntity.status(HttpStatus.OK).build();

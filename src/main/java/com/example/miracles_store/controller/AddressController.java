@@ -45,7 +45,7 @@ public class AddressController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AddressResponseDto> getById(@PathVariable Integer id) {
+    public ResponseEntity<AddressResponseDto> getById(@PathVariable("id") Integer id) {
         AddressResponseDto response = addressMapper.toResponseDto(addressService.getById(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
