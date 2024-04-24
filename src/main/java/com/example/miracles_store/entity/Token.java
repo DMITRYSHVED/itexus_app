@@ -19,5 +19,5 @@ public class Token {
     private String id;
 
     @TimeToLive
-    private Long expiration;
+    private Long timeToLive;
 }

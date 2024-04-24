@@ -2,6 +2,8 @@ package com.example.miracles_store.config;
 
 import com.example.miracles_store.entity.Token;
 import com.example.miracles_store.repository.TokenRepository;
+import com.example.miracles_store.service.JwtService;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +11,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 @Configuration
 @RequiredArgsConstructor
 public class CustomLogoutHandler implements LogoutHandler {
 
     private final TokenRepository tokenRepository;
+
+    private final JwtService jwtService;
 
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
@@ -23,7 +31,11 @@ public class CustomLogoutHandler implements LogoutHandler {
             return;
         }
         String token = authHeader.substring(7);
-        long ttlInSeconds = 24 * 60 * 60;
-        tokenRepository.save(new Token(token, ttlInSeconds));
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        LocalDateTime expiration = jwtService.extractClaim(token, Claims::getExpiration)
+                .toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+
+        tokenRepository.save(new Token(token, Duration.between(currentTime, expiration).toSeconds()));
     }
 }
