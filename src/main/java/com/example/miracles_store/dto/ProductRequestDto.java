@@ -1,8 +1,8 @@
 package com.example.miracles_store.dto;
 
-import com.example.miracles_store.validator.ProductIdExists;
-import com.example.miracles_store.validator.ProductTypeIdExists;
-import com.example.miracles_store.validator.UniqueProductName;
+import com.example.miracles_store.validator.annotation.ProductIdExists;
+import com.example.miracles_store.validator.annotation.ProductTypeIdExists;
+import com.example.miracles_store.validator.annotation.UniqueProductName;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
 import jakarta.validation.constraints.NotBlank;
@@ -12,11 +12,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @UniqueProductName
 public class ProductRequestDto {
 
