@@ -1,6 +1,8 @@
 package com.example.miracles_store.service;
 
 import com.example.miracles_store.dto.filter.SellPositionFilter;
+import com.example.miracles_store.entity.Order;
+import com.example.miracles_store.entity.PositionOrder;
 import com.example.miracles_store.entity.QSellPosition;
 import com.example.miracles_store.entity.SellPosition;
 import com.example.miracles_store.exception.ObjectNotFoundException;
@@ -12,6 +14,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Service
 @Transactional
@@ -19,6 +23,9 @@ public class SellPositionService {
 
     private final SellPositionRepository sellPositionRepository;
 
+    private final PositionOrderService positionOrderService;
+
+    @Transactional(readOnly = true)
     public SellPosition getById(Integer id) {
         return sellPositionRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Can't find sellPosition with id " + id));
@@ -52,7 +59,13 @@ public class SellPositionService {
         return sellPositionRepository.saveAndFlush(sellPosition);
     }
 
-    public void deleteById(Integer id) {
-        sellPositionRepository.deleteById(id);
+    protected void subtractQuantityByOrder(Order order) {
+        List<PositionOrder> positionOrders = positionOrderService.getOrderPositionOrderList(order);
+
+        for (PositionOrder positionOrder : positionOrders) {
+            SellPosition sellPosition = positionOrder.getSellPosition();
+            sellPosition.setQuantity(sellPosition.getQuantity() - positionOrder.getQuantity());
+            sellPositionRepository.saveAndFlush(sellPosition);
+        }
     }
 }

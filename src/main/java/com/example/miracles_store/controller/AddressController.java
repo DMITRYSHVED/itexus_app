@@ -54,7 +54,7 @@ public class AddressController {
     public ResponseEntity<AddressResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                      AddressRequestDto addressDto) {
         AddressResponseDto response = addressMapper.toResponseDto(addressService
-                .save(addressMapper.requestDtoToAddress(addressDto)));
+                .save(addressMapper.requestDtoToEntity(addressDto)));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -62,7 +62,7 @@ public class AddressController {
     public ResponseEntity<AddressResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
                                                      AddressRequestDto addressDto) {
         AddressResponseDto response = addressMapper.toResponseDto(addressService
-                .update(addressMapper.requestDtoToAddress(addressDto)));
+                .update(addressMapper.requestDtoToEntity(addressDto)));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

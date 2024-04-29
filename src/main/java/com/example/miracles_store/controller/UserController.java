@@ -14,7 +14,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -39,26 +38,20 @@ public class UserController {
     public ResponseEntity<List<UserResponseDto>> getAll(UserFilter userFilter, AddressFilter addressFilter,
                                                         @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         List<UserResponseDto> response = (userService.getAll(userFilter, addressFilter, pageable).getContent()
-                .stream().map(userMapper::userToUserResponseDto)).toList();
+                .stream().map(userMapper::entityToResponseDto)).toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getById(@PathVariable("id") Integer id) {
-        UserResponseDto response = userMapper.userToUserResponseDto(userService.getById(id));
+        UserResponseDto response = userMapper.entityToResponseDto(userService.getById(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<UserResponseDto> update(@RequestBody @Valid UserRequestDto userRequestDto) {
-        UserResponseDto response = userMapper.userToUserResponseDto(userService.update(
+        UserResponseDto response = userMapper.entityToResponseDto(userService.update(
                 (userMapper.userRequestDtoToUser(userRequestDto, userService.getById(userRequestDto.getId())))));
         return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Integer id) {
-        userService.deleteById(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

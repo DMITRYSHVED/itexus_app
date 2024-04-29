@@ -32,7 +32,7 @@ public class AuthenticationController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<JwtAuthenticationResponse> signUp(@RequestBody @Valid SignUpRequest request) {
-        JwtAuthenticationResponse response = authenticationService.signUp(userMapper.signUpRequestDtoToUser(request));
+        JwtAuthenticationResponse response = authenticationService.signUp(userMapper.signUpRequestDtoToEntity(request));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -45,7 +45,7 @@ public class AuthenticationController {
     @PutMapping("/change-password")
     public ResponseEntity<?> update(@RequestBody @Valid PasswordChangeDto passwordChangeDto) {
         authenticationService.updatePassword(userMapper
-                .passwordChangeDtoToUser(passwordChangeDto, userService.getById(passwordChangeDto.getUserId())));
+                .passwordChangeDtoToEntity(passwordChangeDto, userService.getById(passwordChangeDto.getUserId())));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

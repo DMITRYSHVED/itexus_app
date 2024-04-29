@@ -1,6 +1,9 @@
 package com.example.miracles_store.handler;
 
+import com.example.miracles_store.exception.EmptyOrderCartException;
+import com.example.miracles_store.exception.NotActivePositionException;
 import com.example.miracles_store.exception.ObjectNotFoundException;
+import com.example.miracles_store.exception.OutOfStockException;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ReferencedEntityException.class)
     public ResponseEntity<String> referencedExceptionInfo(ReferencedEntityException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> IllegalArgumentExceptionInfo(IllegalArgumentException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(EmptyOrderCartException.class)
+    public ResponseEntity<String> EmptyOrderCartExceptionInfo(EmptyOrderCartException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(NotActivePositionException.class)
+    public ResponseEntity<String> NotActivePositionExceptionInfo(NotActivePositionException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<String> OutOfStockExceptionInfo(OutOfStockException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

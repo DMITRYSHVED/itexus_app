@@ -5,8 +5,6 @@ import com.example.miracles_store.dto.filter.UserFilter;
 import com.example.miracles_store.entity.QUser;
 import com.example.miracles_store.entity.User;
 import com.example.miracles_store.exception.ObjectNotFoundException;
-import com.example.miracles_store.exception.ReferencedEntityException;
-import com.example.miracles_store.repository.AddressRepository;
 import com.example.miracles_store.repository.UserRepository;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +27,6 @@ import java.util.Set;
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
-
-    private final AddressRepository addressRepository;
 
     @Transactional(readOnly = true)
     public Page<User> getAll(UserFilter filter, AddressFilter addressFilter, Pageable pageable) {
@@ -85,16 +81,6 @@ public class UserService implements UserDetailsService {
         grantedAuthoritySet.add(new SimpleGrantedAuthority(user.getRole().name()));
         return new org.springframework.security.core.userdetails
                 .User(user.getEmail(), user.getPassword(), grantedAuthoritySet);
-    }
-
-    public void deleteById(Integer id) {
-        User user = getById(id);
-
-        if (addressRepository.existsByUser(user)) {
-            throw new ReferencedEntityException(String
-                    .format("Can't delete user '%s' due to existing addresses", user.getEmail()));
-        }
-        userRepository.deleteById(id);
     }
 
     public User update(User user) {

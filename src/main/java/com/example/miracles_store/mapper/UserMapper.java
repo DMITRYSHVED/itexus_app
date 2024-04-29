@@ -12,7 +12,7 @@ import org.mapstruct.MappingTarget;
 @Mapper
 public interface UserMapper {
 
-    User signUpRequestDtoToUser(SignUpRequest request);
+    User signUpRequestDtoToEntity(SignUpRequest request);
 
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "password", ignore = true)
@@ -20,7 +20,7 @@ public interface UserMapper {
     @Mapping(target = "addresses", ignore = true)
     User userRequestDtoToUser(UserRequestDto userRequestDto, @MappingTarget User user);
 
-    UserResponseDto userToUserResponseDto(User user);
+    UserResponseDto entityToResponseDto(User user);
 
     @Mapping(target = "firstName", ignore = true)
     @Mapping(target = "lastName", ignore = true)
@@ -28,5 +28,5 @@ public interface UserMapper {
     @Mapping(target = "password", source = "newPassword")
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "addresses", ignore = true)
-    User passwordChangeDtoToUser(PasswordChangeDto passwordChangeDto, @MappingTarget User user);
+    User passwordChangeDtoToEntity(PasswordChangeDto passwordChangeDto, @MappingTarget User user);
 }

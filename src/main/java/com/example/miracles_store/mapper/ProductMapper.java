@@ -5,8 +5,7 @@ import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.dto.ProductTypeDto;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.ProductType;
-import com.example.miracles_store.exception.ObjectNotFoundException;
-import com.example.miracles_store.repository.ProductTypeRepository;
+import com.example.miracles_store.service.ProductTypeService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public abstract class ProductMapper {
 
     @Autowired
-    protected ProductTypeRepository productTypeRepository;
+    protected ProductTypeService productTypeService;
 
     @Autowired
     protected ProductTypeMapper productTypeMapper;
@@ -25,7 +24,7 @@ public abstract class ProductMapper {
     public abstract ProductResponseDto toResponseDto(Product product);
 
     @Mapping(target = "productType", source = "productTypeId")
-    public abstract Product requestDtoToProduct(ProductRequestDto productCreateEditDto);
+    public abstract Product requestDtoToEntity(ProductRequestDto productCreateEditDto);
 
     @Named("fromTypeToTypeDto")
     protected ProductTypeDto fromTypeToTypeDto(ProductType productType) {
@@ -33,8 +32,7 @@ public abstract class ProductMapper {
     }
 
     protected ProductType fromTypeIdToType(Integer productTypeId) {
-        return productTypeRepository.findById(productTypeId).orElseThrow(
-                () -> new ObjectNotFoundException("Can't find productType with id " + productTypeId));
+        return productTypeService.getById(productTypeId);
     }
 }
 

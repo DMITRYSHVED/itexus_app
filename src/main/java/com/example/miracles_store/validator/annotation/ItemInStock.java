@@ -1,6 +1,6 @@
 package com.example.miracles_store.validator.annotation;
 
-import com.example.miracles_store.validator.AddressIdExistsValidator;
+import com.example.miracles_store.validator.ItemInStockValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -11,11 +11,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Documented
-@Constraint(validatedBy = {AddressIdExistsValidator.class})
-@Target({ElementType.FIELD})
+@Constraint(validatedBy = {ItemInStockValidator.class})
+@Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface AddressIdExists {
-    String message() default "Address with this ID does not exist";
+public @interface ItemInStock {
+    String message() default "We don't have that many items in stock";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

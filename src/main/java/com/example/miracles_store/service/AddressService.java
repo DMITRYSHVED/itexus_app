@@ -20,6 +20,7 @@ public class AddressService {
 
     private final AddressRepository addressRepository;
 
+    @Transactional(readOnly = true)
     public Page<Address> getAll(AddressFilter addressFilter, Pageable pageable) {
         QAddress qAddress = QAddress.address;
         BooleanBuilder predicate = new BooleanBuilder();
@@ -39,9 +40,13 @@ public class AddressService {
         if (addressFilter.zipCode() != null) {
             predicate.and(qAddress.zipCode.eq(addressFilter.zipCode()));
         }
+        if (addressFilter.userId() != null) {
+            predicate.and((qAddress.user.id.eq(addressFilter.userId())));
+        }
         return addressRepository.findAll(predicate, pageable);
     }
 
+    @Transactional(readOnly = true)
     public Address getById(Integer id) {
         return addressRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Can't find address with id " + id));

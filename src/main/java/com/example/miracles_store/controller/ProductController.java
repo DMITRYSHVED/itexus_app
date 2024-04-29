@@ -54,7 +54,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                      ProductRequestDto product) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
-                save(productMapper.requestDtoToProduct(product)));
+                save(productMapper.requestDtoToEntity(product)));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -62,7 +62,7 @@ public class ProductController {
     public ResponseEntity<ProductResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
                                                      ProductRequestDto productRequestDto) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
-                update(productMapper.requestDtoToProduct(productRequestDto)));
+                update(productMapper.requestDtoToEntity(productRequestDto)));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
