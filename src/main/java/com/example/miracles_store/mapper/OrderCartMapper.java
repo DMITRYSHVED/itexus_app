@@ -2,13 +2,11 @@ package com.example.miracles_store.mapper;
 
 import com.example.miracles_store.dto.OrderCartRequestDto;
 import com.example.miracles_store.dto.OrderCartResponseDto;
-import com.example.miracles_store.dto.SellPositionQuantityDto;
+import com.example.miracles_store.entity.order.SellPositionQuantityResponse;
 import com.example.miracles_store.dto.UserResponseDto;
 import com.example.miracles_store.entity.OrderCart;
-import com.example.miracles_store.entity.SellPosition;
-import com.example.miracles_store.entity.SellPositionQuantity;
+import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.entity.User;
-import com.example.miracles_store.exception.OutOfStockException;
 import com.example.miracles_store.service.SellPositionService;
 import com.example.miracles_store.service.UserService;
 import org.mapstruct.Mapper;
@@ -16,8 +14,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @Mapper
@@ -26,7 +25,8 @@ public abstract class OrderCartMapper {
     @Autowired
     protected UserService userService;
 
-    @Autowired protected SellPositionService sellPositionService;
+    @Autowired
+    protected SellPositionService sellPositionService;
 
     @Autowired
     protected UserMapper userMapper;
@@ -38,12 +38,12 @@ public abstract class OrderCartMapper {
     protected SellPositionQuantityMapper sellPositionQuantityMapper;
 
     @Mapping(target = "id", source = "userId")
-    @Mapping(target = "sellPositionQuantityList", source = "orderCartRequestDto")
+    @Mapping(target = "sellPositionQuantitySet", source = "orderCartRequestDto")
     public abstract OrderCart requestDtoToEntity(OrderCartRequestDto orderCartRequestDto);
 
     @Mapping(target = "user", source = "id", qualifiedByName = "fromIdToUserResponseDto")
-    @Mapping(target = "sellPositionQuantityDtoList", source = "sellPositionQuantityList",
-            qualifiedByName = "fromSellPositionQuantityToSellPositionQuantityDto")
+    @Mapping(target = "sellPositionQuantityDtoSet", source = "sellPositionQuantitySet",
+            qualifiedByName = "fromSellPositionQuantityToSellPositionQuantityResponse")
     public abstract OrderCartResponseDto entityToResponseDto(OrderCart orderCart);
 
 
@@ -53,24 +53,18 @@ public abstract class OrderCartMapper {
         return userMapper.entityToResponseDto(user);
     }
 
-    @Named("fromSellPositionQuantityToSellPositionQuantityDto")
-    protected List<SellPositionQuantityDto> fromSellPositionQuantityToSellPositionQuantityDto(
-            List<SellPositionQuantity> sellPositionQuantityList) {
-        return sellPositionQuantityList.stream().map(sellPositionQuantityMapper::entityToDto).toList();
+    @Named("fromSellPositionQuantityToSellPositionQuantityResponse")
+    protected Set<SellPositionQuantityResponse> fromSellPositionQuantityToSellPositionQuantityDto(
+            Set<SellPositionQuantity> sellPositionQuantitySet) {
+        return sellPositionQuantitySet.stream().map(sellPositionQuantityMapper::entityToResponseDto)
+                .collect(Collectors.toSet());
     }
 
-    protected List<SellPositionQuantity> fromDtoToSellPositionQuantityList(OrderCartRequestDto orderCartRequestDto) {
-        List<SellPositionQuantity> sellPositionQuantityList = new ArrayList<>();
+    protected Set<SellPositionQuantity> fromDtoToSellPositionQuantitySet(OrderCartRequestDto orderCartRequestDto) {
+        Set<SellPositionQuantity> sellPositionQuantitySet = new HashSet<>();
 
-        if (orderCartRequestDto.getQuantity() == null) {
-            SellPosition sellPosition = sellPositionService.getById(orderCartRequestDto.getSellPositionId());
-            if (sellPosition.getQuantity() < 1) {
-                throw new OutOfStockException("Out-of-stock item: " + sellPosition.getProduct().getName());
-            }
-            orderCartRequestDto.setQuantity(1);
-        }
-        sellPositionQuantityList.add(new SellPositionQuantity(orderCartRequestDto.getSellPositionId(),
+        sellPositionQuantitySet.add(new SellPositionQuantity(orderCartRequestDto.getSellPositionId(),
                 orderCartRequestDto.getQuantity()));
-        return sellPositionQuantityList;
+        return sellPositionQuantitySet;
     }
 }

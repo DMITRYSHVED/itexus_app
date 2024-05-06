@@ -1,5 +1,7 @@
 package com.example.miracles_store.dto;
 
+import com.example.miracles_store.entity.enums.OrderStatus;
+import com.example.miracles_store.entity.order.SellPositionQuantityResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +20,7 @@ public class OrderResponseDto {
 
     private String orderComment;
 
-    private String orderStatus;
+    private OrderStatus orderStatus;
 
     private BigDecimal sum;
 
@@ -26,5 +28,5 @@ public class OrderResponseDto {
 
     private UserResponseDto user;
 
-    private List<SellPositionQuantityDto> orderSellPositions;
+    private List<SellPositionQuantityResponse> orderSellPositions;
 }

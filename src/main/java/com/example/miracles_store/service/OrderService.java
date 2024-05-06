@@ -2,16 +2,11 @@ package com.example.miracles_store.service;
 
 import com.example.miracles_store.dto.filter.OrderFilter;
 import com.example.miracles_store.entity.Order;
-import com.example.miracles_store.entity.OrderCart;
 import com.example.miracles_store.entity.PositionOrder;
 import com.example.miracles_store.entity.QOrder;
-import com.example.miracles_store.entity.SellPosition;
-import com.example.miracles_store.entity.SellPositionQuantity;
 import com.example.miracles_store.entity.enums.OrderStatus;
-import com.example.miracles_store.exception.EmptyOrderCartException;
-import com.example.miracles_store.exception.NotActivePositionException;
+import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.exception.ObjectNotFoundException;
-import com.example.miracles_store.exception.OutOfStockException;
 import com.example.miracles_store.repository.OrderRepository;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
@@ -20,8 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -57,34 +51,20 @@ public class OrderService {
         return orderRepository.findAll(predicate, pageable);
     }
 
-    public Order saveOrder(Order order) {
-        List<PositionOrder> positionOrdersToSave = new ArrayList<>();
-        OrderCart orderCart = orderCartService.getByUserId(order.getUser().getId());
-        List<SellPositionQuantity> sellPositionQuantityList = orderCart.getSellPositionQuantityList();
-
-        if (sellPositionQuantityList.isEmpty()) {
-            throw new EmptyOrderCartException("The order cart is empty");
-        }
-        for (SellPositionQuantity sellPositionQuantity : sellPositionQuantityList) {
-            SellPosition sellPosition = sellPositionService.getById(sellPositionQuantity.getSellPositionId());
-            PositionOrder positionOrder;
-            if (!sellPosition.getIsActive()) {
-                throw new NotActivePositionException(String.
-                        format("SellPosition %s is not active.", sellPosition.getProduct().getName()));
-            }
-            if (sellPosition.getQuantity() < sellPositionQuantity.getQuantity()) {
-                throw new OutOfStockException("There is not enough stock of " + sellPosition.getProduct().getName());
-            }
-            positionOrder = new PositionOrder();
-            positionOrder.setSellPosition(sellPosition);
-            positionOrder.setOrder(order);
-            positionOrder.setQuantity(sellPositionQuantity.getQuantity());
-            positionOrdersToSave.add(positionOrder);
-        }
-        orderCartService.deleteSellPositionFromCart(orderCart);
+    public Order saveOrder(Order order, Set<SellPositionQuantity> sellPositionQuantitySet) {
         orderRepository.save(order);
-        positionOrderService.saveAll(positionOrdersToSave);
+
+        sellPositionQuantitySet.stream()
+                .map(sellPositionQuantity -> {
+                    PositionOrder positionOrder = new PositionOrder();
+                    positionOrder.setOrder(order);
+                    positionOrder.setQuantity(sellPositionQuantity.getQuantity());
+                    positionOrder.setSellPosition(sellPositionService.getById(sellPositionQuantity.getSellPositionId()));
+                    return positionOrder;
+                })
+                .forEach(positionOrderService::save);
         sellPositionService.subtractQuantityByOrder(order);
+        orderCartService.deleteSellPositionFromCart(orderCartService.getUserCart(order.getUser().getId()));
         return order;
     }
 

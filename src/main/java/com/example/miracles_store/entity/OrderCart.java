@@ -1,5 +1,6 @@
 package com.example.miracles_store.entity;
 
+import com.example.miracles_store.entity.order.SellPositionQuantity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,5 +20,5 @@ public class OrderCart {
     @Id
     private Integer id;
 
-    private List<SellPositionQuantity> sellPositionQuantityList;
+    private Set<SellPositionQuantity> sellPositionQuantitySet;
 }

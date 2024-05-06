@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "address_controller")
+@Tag(name = "address")
 @RestController
 @RequestMapping("/api/v1/addresses")
 @RequiredArgsConstructor

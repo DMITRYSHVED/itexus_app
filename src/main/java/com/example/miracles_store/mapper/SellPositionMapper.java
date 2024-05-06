@@ -21,7 +21,7 @@ public abstract class SellPositionMapper {
     protected ProductMapper productMapper;
 
     @Mapping(target = "product", source = "sellPosition.product", qualifiedByName = "fromProductToProductDto")
-    public abstract SellPositionResponseDto EntityToResponseDto(SellPosition sellPosition);
+    public abstract SellPositionResponseDto entityToResponseDto(SellPosition sellPosition);
 
     @Mapping(target = "product", source = "productId")
     public abstract SellPosition requestDtoToEntity(SellPositionRequestDto sellPositionRequestDto);

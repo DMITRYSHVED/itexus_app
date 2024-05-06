@@ -2,6 +2,7 @@ package com.example.miracles_store.dto;
 
 import com.example.miracles_store.validator.annotation.ItemInStock;
 import com.example.miracles_store.validator.annotation.SellPositionIdExists;
+import com.example.miracles_store.validator.annotation.UniqueSellPositionInCart;
 import com.example.miracles_store.validator.annotation.UserIdExists;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.DeleteAction;
@@ -16,7 +17,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@ItemInStock(groups = UpdateAction.class)
+@UniqueSellPositionInCart(groups = {CreateAction.class})
+@ItemInStock(groups = {CreateAction.class, UpdateAction.class})
 public class OrderCartRequestDto {
 
     @NotNull
@@ -27,9 +29,8 @@ public class OrderCartRequestDto {
     @SellPositionIdExists
     private Integer sellPositionId;
 
-    @NotNull(groups = UpdateAction.class)
-    @Null(groups = CreateAction.class)
+    @NotNull(groups = {CreateAction.class, UpdateAction.class})
     @Null(groups = DeleteAction.class)
-    @Positive(groups = UpdateAction.class)
+    @Positive(groups = {CreateAction.class, UpdateAction.class})
     private Integer quantity;
 }

@@ -16,8 +16,8 @@ public class PositionOrderService {
 
     private final PositionOrderRepository positionOrderRepository;
 
-    public void saveAll(List<PositionOrder> positionOrders) {
-        positionOrderRepository.saveAll(positionOrders);
+    public void save(PositionOrder positionOrder) {
+        positionOrderRepository.save(positionOrder);
     }
 
     @Transactional(readOnly = true)

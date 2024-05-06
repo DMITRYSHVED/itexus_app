@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Arrays;
 import java.util.List;
 
-@Tag(name = "orderStatus_controller")
+@Tag(name = "orderStatus")
 @RestController
 @RequestMapping("/api/v1/orderStatuses")
 @RequiredArgsConstructor

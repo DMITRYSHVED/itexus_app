@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "order_controller")
+@Tag(name = "order")
 @RestController
 @RequestMapping("/api/v1/orders")
 @RequiredArgsConstructor
@@ -50,10 +50,10 @@ public class OrderController {
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
-                                                   OrderRequestDto orderRequestDto) {
-        OrderResponseDto response = orderMapper.
-                entityToResponseDto(orderService.saveOrder(orderMapper.requestDtoToEntity(orderRequestDto)));
+    public ResponseEntity<OrderResponseDto> create(
+            @RequestBody @Validated({Default.class, CreateAction.class}) OrderRequestDto orderRequestDto) {
+        OrderResponseDto response = orderMapper.entityToResponseDto(orderService
+                .saveOrder(orderMapper.requestDtoToEntity(orderRequestDto), orderRequestDto.getSellPositionQuantitySet()));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

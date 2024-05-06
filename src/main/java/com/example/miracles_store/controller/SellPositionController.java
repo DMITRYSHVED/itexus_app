@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Tag(name = "sellPosition_controller")
+@Tag(name = "sellPosition")
 @RestController
 @RequestMapping("/api/v1/sellPositions")
 @RequiredArgsConstructor
@@ -41,13 +41,13 @@ public class SellPositionController {
                                                                 @PageableDefault(size = 20, sort = "id")
                                                                 Pageable pageable) {
         List<SellPositionResponseDto> response = sellPositionService.getAll(sellPositionFilter, pageable)
-                .getContent().stream().map(sellPositionMapper::EntityToResponseDto).toList();
+                .getContent().stream().map(sellPositionMapper::entityToResponseDto).toList();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SellPositionResponseDto> getById(@PathVariable("id") Integer id) {
-        SellPositionResponseDto response = sellPositionMapper.EntityToResponseDto(sellPositionService.getById(id));
+        SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService.getById(id));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -55,7 +55,7 @@ public class SellPositionController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SellPositionResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                           SellPositionRequestDto sellPosition) {
-        SellPositionResponseDto response = sellPositionMapper.EntityToResponseDto(sellPositionService.
+        SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService.
                 save(sellPositionMapper.requestDtoToEntity(sellPosition)));
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
@@ -64,7 +64,7 @@ public class SellPositionController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SellPositionResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
                                                           SellPositionRequestDto sellPosition) {
-        SellPositionResponseDto response = sellPositionMapper.EntityToResponseDto(sellPositionService
+        SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService
                 .update(sellPositionMapper.requestDtoToEntity(sellPosition)));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

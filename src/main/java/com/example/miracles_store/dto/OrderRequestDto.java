@@ -1,6 +1,11 @@
 package com.example.miracles_store.dto;
 
+import com.example.miracles_store.entity.enums.OrderStatus;
+import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.validator.annotation.AddressIdExists;
+import com.example.miracles_store.validator.annotation.CartItemsAreActive;
+import com.example.miracles_store.validator.annotation.CartItemsInStock;
+import com.example.miracles_store.validator.annotation.CorrectCartSum;
 import com.example.miracles_store.validator.annotation.OrderIdExists;
 import com.example.miracles_store.validator.annotation.PhoneFormat;
 import com.example.miracles_store.validator.annotation.UserIdExists;
@@ -13,10 +18,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@CorrectCartSum(groups = CreateAction.class)
 public class OrderRequestDto {
 
     @NotNull(groups = UpdateAction.class)
@@ -30,9 +37,11 @@ public class OrderRequestDto {
 
     private String orderComment;
 
+    @NotNull(groups = CreateAction.class)
+    @Null(groups = UpdateAction.class)
     private BigDecimal sum;
 
-    private String orderStatus;
+    private OrderStatus orderStatus;
 
     @NotNull
     @AddressIdExists
@@ -42,4 +51,10 @@ public class OrderRequestDto {
     @Null(groups = UpdateAction.class)
     @UserIdExists
     private Integer userId;
+
+    @NotNull(groups = CreateAction.class)
+    @Null(groups = UpdateAction.class)
+    @CartItemsInStock(groups = CreateAction.class)
+    @CartItemsAreActive
+    private Set<SellPositionQuantity> sellPositionQuantitySet;
 }
