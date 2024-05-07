@@ -21,11 +21,9 @@ import lombok.NoArgsConstructor;
 @ItemInStock(groups = {CreateAction.class, UpdateAction.class})
 public class OrderCartRequestDto {
 
-    @NotNull
-    @UserIdExists
+    @UserIdExists(groups = CreateAction.class)
     private Integer userId;
 
-    @NotNull
     @SellPositionIdExists
     private Integer sellPositionId;
 

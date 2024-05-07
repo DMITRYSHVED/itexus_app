@@ -8,7 +8,6 @@ import com.example.miracles_store.entity.ProductType;
 import com.example.miracles_store.service.ProductTypeService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper
@@ -20,13 +19,12 @@ public abstract class ProductMapper {
     @Autowired
     protected ProductTypeMapper productTypeMapper;
 
-    @Mapping(target = "productType", source = "product.productType", qualifiedByName = "fromTypeToTypeDto")
+    @Mapping(target = "productType", source = "product.productType")
     public abstract ProductResponseDto toResponseDto(Product product);
 
     @Mapping(target = "productType", source = "productTypeId")
     public abstract Product requestDtoToEntity(ProductRequestDto productCreateEditDto);
 
-    @Named("fromTypeToTypeDto")
     protected ProductTypeDto fromTypeToTypeDto(ProductType productType) {
         return productTypeMapper.toDto(productType);
     }

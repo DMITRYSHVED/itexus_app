@@ -1,7 +1,7 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.entity.Order;
-import com.example.miracles_store.entity.PositionOrder;
+import com.example.miracles_store.entity.order.Order;
+import com.example.miracles_store.entity.order.PositionOrder;
 import com.example.miracles_store.repository.PositionOrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

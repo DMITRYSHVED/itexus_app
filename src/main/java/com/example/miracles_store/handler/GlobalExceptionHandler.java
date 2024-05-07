@@ -1,6 +1,5 @@
 package com.example.miracles_store.handler;
 
-import com.example.miracles_store.exception.EmptyOrderCartException;
 import com.example.miracles_store.exception.NotActivePositionException;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.exception.OutOfStockException;
@@ -29,11 +28,6 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> IllegalArgumentExceptionInfo(IllegalArgumentException exception) {
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(EmptyOrderCartException.class)
-    public ResponseEntity<String> EmptyOrderCartExceptionInfo(EmptyOrderCartException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 

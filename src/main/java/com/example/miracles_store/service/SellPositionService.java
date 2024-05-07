@@ -1,10 +1,10 @@
 package com.example.miracles_store.service;
 
 import com.example.miracles_store.dto.filter.SellPositionFilter;
-import com.example.miracles_store.entity.Order;
-import com.example.miracles_store.entity.PositionOrder;
+import com.example.miracles_store.entity.order.PositionOrder;
 import com.example.miracles_store.entity.QSellPosition;
 import com.example.miracles_store.entity.SellPosition;
+import com.example.miracles_store.entity.order.Order;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.repository.SellPositionRepository;
 import com.querydsl.core.BooleanBuilder;
@@ -62,10 +62,10 @@ public class SellPositionService {
     protected void subtractQuantityByOrder(Order order) {
         List<PositionOrder> positionOrders = positionOrderService.getOrderPositionOrderList(order);
 
-        for (PositionOrder positionOrder : positionOrders) {
+        positionOrders.forEach(positionOrder -> {
             SellPosition sellPosition = positionOrder.getSellPosition();
             sellPosition.setQuantity(sellPosition.getQuantity() - positionOrder.getQuantity());
             sellPositionRepository.saveAndFlush(sellPosition);
-        }
+        });
     }
 }

@@ -11,7 +11,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,19 +38,19 @@ public class UserController {
                                                         @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         List<UserResponseDto> response = (userService.getAll(userFilter, addressFilter, pageable).getContent()
                 .stream().map(userMapper::entityToResponseDto)).toList();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDto> getById(@PathVariable("id") Integer id) {
         UserResponseDto response = userMapper.entityToResponseDto(userService.getById(id));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping
     public ResponseEntity<UserResponseDto> update(@RequestBody @Valid UserRequestDto userRequestDto) {
         UserResponseDto response = userMapper.entityToResponseDto(userService.update(
                 (userMapper.userRequestDtoToUser(userRequestDto, userService.getById(userRequestDto.getId())))));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 }

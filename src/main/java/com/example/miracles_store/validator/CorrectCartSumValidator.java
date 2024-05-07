@@ -21,9 +21,8 @@ public class CorrectCartSumValidator implements ConstraintValidator<CorrectCartS
     public boolean isValid(OrderRequestDto orderRequestDto, ConstraintValidatorContext context) {
         BigDecimal orderSum = orderRequestDto.getSellPositionQuantitySet().stream().map(sellPositionQuantity -> {
             SellPosition sellPosition = sellPositionService.getById(sellPositionQuantity.getSellPositionId());
-            return sellPosition.getProduct().getCost().multiply(BigDecimal.valueOf(sellPosition.getQuantity()));
+            return sellPosition.getProduct().getCost().multiply(BigDecimal.valueOf(sellPositionQuantity.getQuantity()));
         }).reduce(BigDecimal.ZERO, BigDecimal::add);
-
         return orderSum.equals(orderRequestDto.getSum());
     }
 }

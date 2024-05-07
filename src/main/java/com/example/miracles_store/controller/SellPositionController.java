@@ -42,22 +42,24 @@ public class SellPositionController {
                                                                 Pageable pageable) {
         List<SellPositionResponseDto> response = sellPositionService.getAll(sellPositionFilter, pageable)
                 .getContent().stream().map(sellPositionMapper::entityToResponseDto).toList();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SellPositionResponseDto> getById(@PathVariable("id") Integer id) {
         SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService.getById(id));
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
+        return ResponseEntity.ok(response);    }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SellPositionResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                           SellPositionRequestDto sellPosition) {
+
+        System.out.println(sellPosition);
+
         SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService.
                 save(sellPositionMapper.requestDtoToEntity(sellPosition)));
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
@@ -66,6 +68,6 @@ public class SellPositionController {
                                                           SellPositionRequestDto sellPosition) {
         SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService
                 .update(sellPositionMapper.requestDtoToEntity(sellPosition)));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 }

@@ -7,6 +7,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 public class ProductIdExistsValidator implements ConstraintValidator<ProductIdExists, Integer> {
@@ -15,6 +17,9 @@ public class ProductIdExistsValidator implements ConstraintValidator<ProductIdEx
 
     @Override
     public boolean isValid(Integer productId, ConstraintValidatorContext context) {
+        if (Objects.isNull(productId)) {
+            return false;
+        }
         return productRepository.existsById(productId);
     }
 }

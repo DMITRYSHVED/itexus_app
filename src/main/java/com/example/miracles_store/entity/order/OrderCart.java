@@ -1,6 +1,5 @@
-package com.example.miracles_store.entity;
+package com.example.miracles_store.entity.order;
 
-import com.example.miracles_store.entity.order.SellPositionQuantity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 @UniqueProductName
 public class ProductRequestDto {
 
-    @NotNull(groups = UpdateAction.class)
     @ProductIdExists(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     private Integer id;
@@ -38,7 +37,6 @@ public class ProductRequestDto {
     @Positive
     private BigDecimal cost;
 
-    @NotNull
     @ProductTypeIdExists
     private Integer productTypeId;
 }

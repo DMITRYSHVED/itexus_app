@@ -1,6 +1,5 @@
-package com.example.miracles_store.entity.order;
+package com.example.miracles_store.dto;
 
-import com.example.miracles_store.dto.SellPositionResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SellPositionQuantityResponse {
+public class SellPositionQuantityResponseDto {
 
     private SellPositionResponseDto sellPositionResponseDto;
 

@@ -8,7 +8,6 @@ import com.example.miracles_store.entity.SellPosition;
 import com.example.miracles_store.service.ProductService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Mapper
@@ -20,13 +19,12 @@ public abstract class SellPositionMapper {
     @Autowired
     protected ProductMapper productMapper;
 
-    @Mapping(target = "product", source = "sellPosition.product", qualifiedByName = "fromProductToProductDto")
+    @Mapping(target = "product", source = "sellPosition.product")
     public abstract SellPositionResponseDto entityToResponseDto(SellPosition sellPosition);
 
     @Mapping(target = "product", source = "productId")
     public abstract SellPosition requestDtoToEntity(SellPositionRequestDto sellPositionRequestDto);
 
-    @Named("fromProductToProductDto")
     protected ProductResponseDto fromProductToProductDto(Product product) {
         return productMapper.toResponseDto(product);
     }

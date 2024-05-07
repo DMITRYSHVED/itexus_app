@@ -1,9 +1,9 @@
 package com.example.miracles_store.service;
 
 import com.example.miracles_store.dto.filter.OrderFilter;
-import com.example.miracles_store.entity.Order;
-import com.example.miracles_store.entity.PositionOrder;
-import com.example.miracles_store.entity.QOrder;
+import com.example.miracles_store.entity.order.Order;
+import com.example.miracles_store.entity.order.PositionOrder;
+import com.example.miracles_store.entity.order.QOrder;
 import com.example.miracles_store.entity.enums.OrderStatus;
 import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.exception.ObjectNotFoundException;
@@ -64,7 +64,7 @@ public class OrderService {
                 })
                 .forEach(positionOrderService::save);
         sellPositionService.subtractQuantityByOrder(order);
-        orderCartService.deleteSellPositionFromCart(orderCartService.getUserCart(order.getUser().getId()));
+        orderCartService.deleteById(order.getUser().getId());
         return order;
     }
 

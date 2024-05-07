@@ -1,7 +1,7 @@
 package com.example.miracles_store.validator;
 
 import com.example.miracles_store.dto.OrderCartRequestDto;
-import com.example.miracles_store.entity.OrderCart;
+import com.example.miracles_store.entity.order.OrderCart;
 import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.repository.OrderCartRepository;

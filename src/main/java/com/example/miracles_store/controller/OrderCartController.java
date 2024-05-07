@@ -4,6 +4,7 @@ import com.example.miracles_store.dto.OrderCartRequestDto;
 import com.example.miracles_store.dto.OrderCartResponseDto;
 import com.example.miracles_store.entity.User;
 import com.example.miracles_store.mapper.OrderCartMapper;
+import com.example.miracles_store.mapper.SellPositionQuantityMapper;
 import com.example.miracles_store.service.OrderCartService;
 import com.example.miracles_store.service.UserService;
 import com.example.miracles_store.validator.group.CreateAction;
@@ -14,8 +15,8 @@ import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,35 +39,41 @@ public class OrderCartController {
 
     private final OrderCartMapper orderCartMapper;
 
+    private final SellPositionQuantityMapper sellPositionQuantityMapper;
+
     @GetMapping
-    public ResponseEntity<OrderCartResponseDto> getUserCart() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        User user =  userService.getByEmail(authentication.getName());
+    public ResponseEntity<OrderCartResponseDto> getUserCart(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.getByEmail(userDetails.getUsername());
 
         OrderCartResponseDto response = orderCartMapper.entityToResponseDto(orderCartService.getUserCart(user.getId()));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<OrderCartResponseDto> addPositionToCart(
-            @RequestBody @Validated({Default.class, CreateAction.class}) OrderCartRequestDto orderCartRequestDto) {
-        OrderCartResponseDto response = orderCartMapper
-                .entityToResponseDto(orderCartService.save(orderCartMapper.requestDtoToEntity(orderCartRequestDto)));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<OrderCartResponseDto> addPositionToCart(@RequestBody @Validated
+            ({Default.class, CreateAction.class}) OrderCartRequestDto orderCartRequestDto) {
+        OrderCartResponseDto response = orderCartMapper.entityToResponseDto(orderCartService.
+                saveSellPositionToCart(orderCartMapper.requestDtoToEntity(orderCartRequestDto)));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteFromCart(
-            @RequestBody @Validated({Default.class, DeleteAction.class}) OrderCartRequestDto orderCartRequestDto) {
-        orderCartService.deleteSellPositionFromCart(orderCartMapper.requestDtoToEntity(orderCartRequestDto));
+    public ResponseEntity<?> deleteFromCart(@AuthenticationPrincipal UserDetails userDetails, @RequestBody
+    @Validated({Default.class, DeleteAction.class}) OrderCartRequestDto sellPositionQuantityRequestDto) {
+        User user = userService.getByEmail(userDetails.getUsername());
+
+        orderCartService.deleteSellPositionFromCart(user.getId(), sellPositionQuantityMapper.
+                orderCartRequestDtoToToEntity(sellPositionQuantityRequestDto));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     @PutMapping
-    public ResponseEntity<OrderCartResponseDto> updatePositionQuantity(
+    public ResponseEntity<OrderCartResponseDto> updatePositionQuantity(@AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Validated({Default.class, UpdateAction.class}) OrderCartRequestDto orderCartRequestDto) {
-        OrderCartResponseDto response = orderCartMapper.entityToResponseDto(orderCartService.
-                updatePositionQuantity(orderCartMapper.requestDtoToEntity(orderCartRequestDto)));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        User user = userService.getByEmail(userDetails.getUsername());
+
+        OrderCartResponseDto response = orderCartMapper.entityToResponseDto(orderCartService.updatePositionQuantity(
+                user.getId(), sellPositionQuantityMapper.orderCartRequestDtoToToEntity(orderCartRequestDto)));
+        return ResponseEntity.ok(response);
     }
 }

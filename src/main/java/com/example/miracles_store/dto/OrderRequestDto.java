@@ -8,7 +8,6 @@ import com.example.miracles_store.validator.annotation.CartItemsInStock;
 import com.example.miracles_store.validator.annotation.CorrectCartSum;
 import com.example.miracles_store.validator.annotation.OrderIdExists;
 import com.example.miracles_store.validator.annotation.PhoneFormat;
-import com.example.miracles_store.validator.annotation.UserIdExists;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
 import jakarta.validation.constraints.NotNull;
@@ -26,12 +25,10 @@ import java.util.Set;
 @CorrectCartSum(groups = CreateAction.class)
 public class OrderRequestDto {
 
-    @NotNull(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     @OrderIdExists(groups = UpdateAction.class)
     private Integer id;
 
-    @NotNull
     @PhoneFormat
     private String phone;
 
@@ -41,20 +38,14 @@ public class OrderRequestDto {
     @Null(groups = UpdateAction.class)
     private BigDecimal sum;
 
+    @NotNull
     private OrderStatus orderStatus;
 
-    @NotNull
     @AddressIdExists
     private Integer addressId;
 
-    @NotNull(groups = CreateAction.class)
-    @Null(groups = UpdateAction.class)
-    @UserIdExists
-    private Integer userId;
-
-    @NotNull(groups = CreateAction.class)
     @Null(groups = UpdateAction.class)
     @CartItemsInStock(groups = CreateAction.class)
-    @CartItemsAreActive
+    @CartItemsAreActive(groups = CreateAction.class)
     private Set<SellPositionQuantity> sellPositionQuantitySet;
 }

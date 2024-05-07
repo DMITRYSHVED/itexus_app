@@ -41,13 +41,13 @@ public class AddressController {
                                                            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         List<AddressResponseDto> response = addressService.getAll(addressFilter, pageable)
                 .getContent().stream().map(addressMapper::toResponseDto).toList();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<AddressResponseDto> getById(@PathVariable("id") Integer id) {
         AddressResponseDto response = addressMapper.toResponseDto(addressService.getById(id));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -55,7 +55,7 @@ public class AddressController {
                                                      AddressRequestDto addressDto) {
         AddressResponseDto response = addressMapper.toResponseDto(addressService
                 .save(addressMapper.requestDtoToEntity(addressDto)));
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
@@ -63,7 +63,7 @@ public class AddressController {
                                                      AddressRequestDto addressDto) {
         AddressResponseDto response = addressMapper.toResponseDto(addressService
                 .update(addressMapper.requestDtoToEntity(addressDto)));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

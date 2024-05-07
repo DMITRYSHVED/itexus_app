@@ -41,13 +41,13 @@ public class ProductController {
                                                            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         List<ProductResponseDto> response = productService.getAll(productFilter, pageable).getContent().stream()
                 .map(productMapper::toResponseDto).toList();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") Integer id) {
         ProductResponseDto response = productMapper.toResponseDto(productService.getById(id));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -55,7 +55,7 @@ public class ProductController {
                                                      ProductRequestDto product) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
                 save(productMapper.requestDtoToEntity(product)));
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
@@ -63,7 +63,7 @@ public class ProductController {
                                                      ProductRequestDto productRequestDto) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
                 update(productMapper.requestDtoToEntity(productRequestDto)));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

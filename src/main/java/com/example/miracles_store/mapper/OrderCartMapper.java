@@ -2,16 +2,15 @@ package com.example.miracles_store.mapper;
 
 import com.example.miracles_store.dto.OrderCartRequestDto;
 import com.example.miracles_store.dto.OrderCartResponseDto;
-import com.example.miracles_store.entity.order.SellPositionQuantityResponse;
+import com.example.miracles_store.dto.SellPositionQuantityResponseDto;
 import com.example.miracles_store.dto.UserResponseDto;
-import com.example.miracles_store.entity.OrderCart;
+import com.example.miracles_store.entity.order.OrderCart;
 import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.entity.User;
 import com.example.miracles_store.service.SellPositionService;
 import com.example.miracles_store.service.UserService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashSet;
@@ -41,20 +40,16 @@ public abstract class OrderCartMapper {
     @Mapping(target = "sellPositionQuantitySet", source = "orderCartRequestDto")
     public abstract OrderCart requestDtoToEntity(OrderCartRequestDto orderCartRequestDto);
 
-    @Mapping(target = "user", source = "id", qualifiedByName = "fromIdToUserResponseDto")
-    @Mapping(target = "sellPositionQuantityDtoSet", source = "sellPositionQuantitySet",
-            qualifiedByName = "fromSellPositionQuantityToSellPositionQuantityResponse")
+    @Mapping(target = "user", source = "id")
+    @Mapping(target = "sellPositionQuantityDtoSet", source = "sellPositionQuantitySet")
     public abstract OrderCartResponseDto entityToResponseDto(OrderCart orderCart);
 
-
-    @Named("fromIdToUserResponseDto")
     protected UserResponseDto fromIdToUserResponseDto(Integer id) {
         User user = userService.getById(id);
         return userMapper.entityToResponseDto(user);
     }
 
-    @Named("fromSellPositionQuantityToSellPositionQuantityResponse")
-    protected Set<SellPositionQuantityResponse> fromSellPositionQuantityToSellPositionQuantityDto(
+    protected Set<SellPositionQuantityResponseDto> fromSellPositionQuantityToSellPositionQuantityDto(
             Set<SellPositionQuantity> sellPositionQuantitySet) {
         return sellPositionQuantitySet.stream().map(sellPositionQuantityMapper::entityToResponseDto)
                 .collect(Collectors.toSet());

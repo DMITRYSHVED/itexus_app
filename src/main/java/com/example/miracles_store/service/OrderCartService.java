@@ -1,6 +1,6 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.entity.OrderCart;
+import com.example.miracles_store.entity.order.OrderCart;
 import com.example.miracles_store.entity.order.SellPositionQuantity;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.repository.OrderCartRepository;
@@ -17,19 +17,33 @@ public class OrderCartService {
 
     private final OrderCartRepository orderCartRepository;
 
-    public OrderCart save(OrderCart orderCart) {
+    public OrderCart saveSellPositionToCart(OrderCart orderCart) {
         if (!orderCartRepository.existsById(orderCart.getId())) {
-            return orderCartRepository.save(orderCart);
+            return save(orderCart);
         }
 
         OrderCart existingCart = getUserCart(orderCart.getId());
         Set<SellPositionQuantity> existingSellPositionQuantities = existingCart.getSellPositionQuantitySet();
 
         existingSellPositionQuantities.addAll(orderCart.getSellPositionQuantitySet());
-        return orderCartRepository.save(existingCart);
+        return update(existingCart);
     }
 
+    protected OrderCart save(OrderCart orderCart) {
+        return orderCartRepository.save(orderCart);
+    }
 
+    protected OrderCart update(OrderCart orderCart) {
+        return orderCartRepository.save(orderCart);
+    }
+
+    protected void deleteById(Integer userId) {
+        orderCartRepository.deleteById(userId);
+    }
+
+    protected void delete(OrderCart orderCart) {
+        orderCartRepository.delete(orderCart);
+    }
 
     @Transactional(readOnly = true)
     public OrderCart getUserCart(Integer userId) {
@@ -37,38 +51,28 @@ public class OrderCartService {
                 "Can't find order Cart by user with id: " + userId));
     }
 
-    public void deleteSellPositionFromCart(OrderCart orderCart) {
-        OrderCart storedOrderCart = getUserCart(orderCart.getId());
+    public void deleteSellPositionFromCart(Integer userId, SellPositionQuantity sellPositionQuantity) {
+        OrderCart storedOrderCart = getUserCart(userId);
         Set<SellPositionQuantity> sellPositionQuantitySet = storedOrderCart.getSellPositionQuantitySet();
-        Set<SellPositionQuantity> sellPositionQuantityToDeleteSet = orderCart.getSellPositionQuantitySet();
 
-        sellPositionQuantitySet.removeIf(sellPositionQuantity ->
-                sellPositionQuantityToDeleteSet.stream()
-                        .anyMatch(sellPositionQuantityToDelete ->
-                                sellPositionQuantity.getSellPositionId()
-                                        .equals(sellPositionQuantityToDelete.getSellPositionId())));
-        if (storedOrderCart.getSellPositionQuantitySet().isEmpty()) {
-            orderCartRepository.delete(storedOrderCart);
+        sellPositionQuantitySet.removeIf(storedSellPositionQuantity ->
+                storedSellPositionQuantity.getSellPositionId().equals(sellPositionQuantity.getSellPositionId()));
+        if (sellPositionQuantitySet.isEmpty()) {
+            delete(storedOrderCart);
         } else {
-            orderCartRepository.save(storedOrderCart);
+            update(storedOrderCart);
         }
     }
 
-    public OrderCart updatePositionQuantity(OrderCart orderCart) {
-        OrderCart storedOrderCart = getUserCart(orderCart.getId());
+    public OrderCart updatePositionQuantity(Integer userId, SellPositionQuantity sellPositionQuantity) {
+        OrderCart storedOrderCart = getUserCart(userId);
         Set<SellPositionQuantity> sellPositionQuantitySet = storedOrderCart.getSellPositionQuantitySet();
 
         sellPositionQuantitySet.stream()
-                .filter(sellPositionQuantity -> orderCart.getSellPositionQuantitySet().stream()
-                        .anyMatch(positionQuantity -> positionQuantity.getSellPositionId().equals(sellPositionQuantity.getSellPositionId())))
-                .forEach(sellPositionQuantity -> sellPositionQuantity.setQuantity(
-                        orderCart.getSellPositionQuantitySet().stream()
-                                .filter(positionQuantity -> positionQuantity.getSellPositionId().equals(sellPositionQuantity.getSellPositionId()))
-                                .findFirst()
-                                .map(SellPositionQuantity::getQuantity)
-                                .orElse(sellPositionQuantity.getQuantity())
-                ));
-        return orderCartRepository.save(storedOrderCart);
+                .filter(storedSellPositionQuantity ->
+                        storedSellPositionQuantity.getSellPositionId().equals(sellPositionQuantity.getSellPositionId()))
+                .findFirst().ifPresent(storedSellPositionQuantity ->
+                        storedSellPositionQuantity.setQuantity(sellPositionQuantity.getQuantity()));
+        return update(storedOrderCart);
     }
-
 }

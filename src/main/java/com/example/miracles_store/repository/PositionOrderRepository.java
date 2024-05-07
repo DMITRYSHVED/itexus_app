@@ -1,8 +1,8 @@
 package com.example.miracles_store.repository;
 
-import com.example.miracles_store.entity.Order;
-import com.example.miracles_store.entity.PositionOrder;
-import com.example.miracles_store.entity.PositionOrderId;
+import com.example.miracles_store.entity.order.Order;
+import com.example.miracles_store.entity.order.PositionOrder;
+import com.example.miracles_store.entity.order.PositionOrderId;
 import com.example.miracles_store.entity.QPositionOrder;
 import org.apache.commons.collections4.IterableUtils;
 import org.springframework.data.jpa.repository.JpaRepository;
