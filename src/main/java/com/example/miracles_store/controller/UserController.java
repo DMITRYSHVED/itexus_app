@@ -9,6 +9,7 @@ import com.example.miracles_store.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @Tag(name = "user")
 @RestController
@@ -34,10 +33,10 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<List<UserResponseDto>> getAll(UserFilter userFilter, AddressFilter addressFilter,
+    public ResponseEntity<Page<UserResponseDto>> getAll(UserFilter userFilter, AddressFilter addressFilter,
                                                         @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        List<UserResponseDto> response = (userService.getAll(userFilter, addressFilter, pageable).getContent()
-                .stream().map(userMapper::entityToResponseDto)).toList();
+        Page<UserResponseDto> response = (userService.getAll(userFilter, addressFilter, pageable).
+                map(userMapper::entityToResponseDto));
         return ResponseEntity.ok(response);
     }
 

@@ -10,6 +10,7 @@ import com.example.miracles_store.validator.group.UpdateAction;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Tag(name = "product")
 @RestController
 @RequestMapping("/api/v1/products")
@@ -37,10 +36,10 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAll(ProductFilter productFilter,
+    public ResponseEntity<Page<ProductResponseDto>> getAll(ProductFilter productFilter,
                                                            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        List<ProductResponseDto> response = productService.getAll(productFilter, pageable).getContent().stream()
-                .map(productMapper::toResponseDto).toList();
+        Page<ProductResponseDto> response = productService.getAll(productFilter, pageable).
+                map(productMapper::toResponseDto);
         return ResponseEntity.ok(response);
     }
 

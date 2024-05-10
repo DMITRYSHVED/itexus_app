@@ -10,6 +10,7 @@ import com.example.miracles_store.validator.group.UpdateAction;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Tag(name = "address")
 @RestController
 @RequestMapping("/api/v1/addresses")
@@ -37,10 +36,10 @@ public class AddressController {
     private final AddressMapper addressMapper;
 
     @GetMapping
-    public ResponseEntity<List<AddressResponseDto>> getAll(AddressFilter addressFilter,
+    public ResponseEntity<Page<AddressResponseDto>> getAll(AddressFilter addressFilter,
                                                            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        List<AddressResponseDto> response = addressService.getAll(addressFilter, pageable)
-                .getContent().stream().map(addressMapper::toResponseDto).toList();
+        Page<AddressResponseDto> response = addressService.getAll(addressFilter, pageable).
+                map(addressMapper::toResponseDto);
         return ResponseEntity.ok(response);
     }
 

@@ -8,6 +8,7 @@ import com.example.miracles_store.validator.group.UpdateAction;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Tag(name = "productType")
 @RestController
 @RequestMapping("/api/v1/productTypes")
@@ -35,9 +34,8 @@ public class ProductTypeController {
     private final ProductTypeMapper productTypeMapper;
 
     @GetMapping
-    public ResponseEntity<List<ProductTypeDto>> getAll(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        List<ProductTypeDto> response = productTypeService.getAll(pageable).getContent().stream()
-                .map(productTypeMapper::toDto).toList();
+    public ResponseEntity<Page<ProductTypeDto>> getAll(@PageableDefault(size = 20, sort = "id") Pageable pageable) {
+        Page<ProductTypeDto> response = productTypeService.getAll(pageable).map(productTypeMapper::toDto);
         return ResponseEntity.ok(response);
     }
 

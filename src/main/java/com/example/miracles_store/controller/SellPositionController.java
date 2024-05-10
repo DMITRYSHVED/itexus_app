@@ -10,6 +10,7 @@ import com.example.miracles_store.validator.group.UpdateAction;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,8 +25,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Tag(name = "sellPosition")
 @RestController
 @RequestMapping("/api/v1/sellPositions")
@@ -37,26 +36,24 @@ public class SellPositionController {
     private final SellPositionMapper sellPositionMapper;
 
     @GetMapping
-    public ResponseEntity<List<SellPositionResponseDto>> getAll(SellPositionFilter sellPositionFilter,
+    public ResponseEntity<Page<SellPositionResponseDto>> getAll(SellPositionFilter sellPositionFilter,
                                                                 @PageableDefault(size = 20, sort = "id")
                                                                 Pageable pageable) {
-        List<SellPositionResponseDto> response = sellPositionService.getAll(sellPositionFilter, pageable)
-                .getContent().stream().map(sellPositionMapper::entityToResponseDto).toList();
+        Page<SellPositionResponseDto> response = sellPositionService.getAll(sellPositionFilter, pageable).
+                map(sellPositionMapper::entityToResponseDto);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SellPositionResponseDto> getById(@PathVariable("id") Integer id) {
         SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService.getById(id));
-        return ResponseEntity.ok(response);    }
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<SellPositionResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                           SellPositionRequestDto sellPosition) {
-
-        System.out.println(sellPosition);
-
         SellPositionResponseDto response = sellPositionMapper.entityToResponseDto(sellPositionService.
                 save(sellPositionMapper.requestDtoToEntity(sellPosition)));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);

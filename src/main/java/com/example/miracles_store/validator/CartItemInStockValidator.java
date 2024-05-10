@@ -8,7 +8,6 @@ import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.Set;
 
 @Component
@@ -19,10 +18,7 @@ public class CartItemInStockValidator implements ConstraintValidator<CartItemsIn
 
     @Override
     public boolean isValid(Set<SellPositionQuantity> sellPositionQuantitySet, ConstraintValidatorContext context) {
-        if (Objects.isNull(sellPositionQuantitySet)) {
-            return false;
-        }
-        return sellPositionQuantitySet.stream().noneMatch(sellPositionQuantity -> sellPositionService.
+        return sellPositionQuantitySet != null && sellPositionQuantitySet.stream().noneMatch(sellPositionQuantity -> sellPositionService.
                 getById(sellPositionQuantity.getSellPositionId()).getQuantity() < sellPositionQuantity.getQuantity());
     }
 }

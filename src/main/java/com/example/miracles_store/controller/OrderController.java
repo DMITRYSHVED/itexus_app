@@ -13,6 +13,7 @@ import com.example.miracles_store.validator.group.UpdateAction;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @Tag(name = "order")
 @RestController
 @RequestMapping("/api/v1/orders")
@@ -42,10 +41,10 @@ public class OrderController {
     private final OrderMapper orderMapper;
 
     @GetMapping
-    public ResponseEntity<List<OrderResponseDto>> getAll(OrderFilter orderFilter,
+    public ResponseEntity<Page<OrderResponseDto>> getAll(OrderFilter orderFilter,
                                                          @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        List<OrderResponseDto> response = orderService.getAll(orderFilter, pageable).getContent().stream()
-                .map(orderMapper::entityToResponseDto).toList();
+        Page<OrderResponseDto> response = orderService.getAll(orderFilter, pageable).
+                map(orderMapper::entityToResponseDto);
         return ResponseEntity.ok(response);
     }
 
@@ -57,7 +56,7 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponseDto> create(@AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody @Validated({Default.class, CreateAction.class}) OrderRequestDto orderRequestDto) {
+                                                   @RequestBody @Validated({Default.class, CreateAction.class}) OrderRequestDto orderRequestDto) {
         User user = userService.getByEmail(userDetails.getUsername());
         Order order = orderMapper.requestDtoToEntity(orderRequestDto);
 

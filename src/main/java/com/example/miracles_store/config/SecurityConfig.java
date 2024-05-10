@@ -43,11 +43,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/api/v1/sellPositions/**", "/api/v1/auth/**", "/swagger-ui/**",
                                 "/swagger-resources/*", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/v1/addresses/**", "/api/v1/sellPositions", "/api/v1/users",
-                                "/api/v1/orderStatuses/**", "/api/v1/cart/**", "/api/v1/orders/**",
-                                "/api/v1/auth/change-password").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/v1/products/**", "/api/v1/productTypes/**", "/api/v1/roles")
-                        .hasRole("ADMIN"))
+                        .hasRole("ADMIN").anyRequest().authenticated())
                 .logout(logoutConfigurer -> logoutConfigurer.logoutUrl("/logout").addLogoutHandler(logoutHandler)
                         .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
