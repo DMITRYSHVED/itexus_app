@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AddressIdExists {
-    String message() default "Product with this ID does not exist";
+    String message() default "Address with this ID does not exist";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

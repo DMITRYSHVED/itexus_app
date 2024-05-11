@@ -16,6 +16,6 @@ public class SellPositionIdExistsValidator implements
 
     @Override
     public boolean isValid(Integer sellPositionId, ConstraintValidatorContext context) {
-        return sellPositionRepository.existsById(sellPositionId);
+        return sellPositionId != null && sellPositionRepository.existsById(sellPositionId);
     }
 }

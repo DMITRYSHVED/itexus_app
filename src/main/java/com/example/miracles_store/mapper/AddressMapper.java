@@ -4,8 +4,7 @@ import com.example.miracles_store.dto.AddressRequestDto;
 import com.example.miracles_store.dto.AddressResponseDto;
 import com.example.miracles_store.entity.Address;
 import com.example.miracles_store.entity.User;
-import com.example.miracles_store.exception.ObjectNotFoundException;
-import com.example.miracles_store.repository.UserRepository;
+import com.example.miracles_store.service.UserService;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,7 @@ public abstract class AddressMapper {
 
 
     @Autowired
-    protected UserRepository userRepository;
+    protected UserService userService;
 
     @Autowired
     protected UserMapper userMapper;
@@ -23,10 +22,9 @@ public abstract class AddressMapper {
     public abstract AddressResponseDto toResponseDto(Address address);
 
     @Mapping(target = "user", source = "userId")
-    public abstract Address requestDtoToAddress(AddressRequestDto addressRequestDto);
+    public abstract Address requestDtoToEntity(AddressRequestDto addressRequestDto);
 
     protected User fromUserIdToUser(Integer userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new ObjectNotFoundException("Can't find user with id " + userId));
+        return userService.getById(userId);
     }
 }

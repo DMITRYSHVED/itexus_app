@@ -1,5 +1,7 @@
-package com.example.miracles_store.entity;
+package com.example.miracles_store.entity.order;
 
+import com.example.miracles_store.entity.Address;
+import com.example.miracles_store.entity.User;
 import com.example.miracles_store.entity.enums.OrderStatus;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

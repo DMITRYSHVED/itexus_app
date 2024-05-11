@@ -15,6 +15,6 @@ public class ProductTypeIdExistsValidator implements ConstraintValidator<Product
 
     @Override
     public boolean isValid(Integer productTypeId, ConstraintValidatorContext context) {
-        return productTypeRepository.existsById(productTypeId);
+        return productTypeId != null && productTypeRepository.existsById(productTypeId);
     }
 }

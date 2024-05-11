@@ -5,7 +5,6 @@ import com.example.miracles_store.validator.annotation.UserIdExists;
 import com.example.miracles_store.validator.group.CreateAction;
 import com.example.miracles_store.validator.group.UpdateAction;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AddressRequestDto {
 
-    @NotNull(groups = UpdateAction.class)
     @AddressIdExists(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     private Integer id;
@@ -41,7 +39,6 @@ public class AddressRequestDto {
     @Size(max = 20)
     private String zipCode;
 
-    @NotNull
     @UserIdExists
     private Integer userId;
 }

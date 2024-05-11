@@ -10,6 +10,7 @@ import com.example.miracles_store.validator.group.UpdateAction;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -24,9 +25,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-@Tag(name = "product_controller")
+@Tag(name = "product")
 @RestController
 @RequestMapping("/api/v1/products")
 @RequiredArgsConstructor
@@ -37,33 +36,33 @@ public class ProductController {
     private final ProductMapper productMapper;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDto>> getAll(ProductFilter productFilter,
+    public ResponseEntity<Page<ProductResponseDto>> getAll(ProductFilter productFilter,
                                                            @PageableDefault(size = 20, sort = "id") Pageable pageable) {
-        List<ProductResponseDto> response = productService.getAll(productFilter, pageable).getContent().stream()
-                .map(productMapper::toResponseDto).toList();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        Page<ProductResponseDto> response = productService.getAll(productFilter, pageable).
+                map(productMapper::toResponseDto);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponseDto> getById(@PathVariable("id") Integer id) {
         ProductResponseDto response = productMapper.toResponseDto(productService.getById(id));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
     public ResponseEntity<ProductResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                      ProductRequestDto product) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
-                save(productMapper.requestDtoToProduct(product)));
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+                save(productMapper.requestDtoToEntity(product)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping
     public ResponseEntity<ProductResponseDto> update(@RequestBody @Validated({Default.class, UpdateAction.class})
                                                      ProductRequestDto productRequestDto) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
-                update(productMapper.requestDtoToProduct(productRequestDto)));
-        return new ResponseEntity<>(response, HttpStatus.OK);
+                update(productMapper.requestDtoToEntity(productRequestDto)));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

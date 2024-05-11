@@ -15,6 +15,6 @@ public class AddressIdExistsValidator implements ConstraintValidator<AddressIdEx
 
     @Override
     public boolean isValid(Integer addressId, ConstraintValidatorContext context) {
-        return addressRepository.existsById(addressId);
+        return addressId != null && addressRepository.existsById(addressId);
     }
 }

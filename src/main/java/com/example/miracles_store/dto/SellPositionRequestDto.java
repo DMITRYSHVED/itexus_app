@@ -20,12 +20,10 @@ import lombok.NoArgsConstructor;
 @UniqueSellPosition
 public class SellPositionRequestDto {
 
-    @NotNull(groups = UpdateAction.class)
     @SellPositionIdExists(groups = UpdateAction.class)
     @Null(groups = CreateAction.class)
     private Integer id;
 
-    @NotNull
     @ProductIdExists
     private Integer productId;
 

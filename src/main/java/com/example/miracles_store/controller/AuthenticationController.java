@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "authentication_controller")
+@Tag(name = "authentication")
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -32,20 +32,20 @@ public class AuthenticationController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<JwtAuthenticationResponse> signUp(@RequestBody @Valid SignUpRequest request) {
-        JwtAuthenticationResponse response = authenticationService.signUp(userMapper.signUpRequestDtoToUser(request));
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+        JwtAuthenticationResponse response = authenticationService.signUp(userMapper.signUpRequestDtoToEntity(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/sign-in")
     public ResponseEntity<JwtAuthenticationResponse> signIn(@RequestBody @Valid SignInRequest request) {
         JwtAuthenticationResponse response = authenticationService.signIn(request);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/change-password")
     public ResponseEntity<?> update(@RequestBody @Valid PasswordChangeDto passwordChangeDto) {
-        authenticationService.updatePassword(userMapper
-                .passwordChangeDtoToUser(passwordChangeDto, userService.getById(passwordChangeDto.getUserId())));
+        authenticationService.updatePassword(userMapper.passwordChangeDtoToEntity(passwordChangeDto,
+                userService.getById(passwordChangeDto.getUserId())));
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
