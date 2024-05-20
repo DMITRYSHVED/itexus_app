@@ -20,4 +20,6 @@ public class ProductResponseDto {
     private BigDecimal cost;
 
     private ProductTypeDto productType;
+
+    private String encodedImage;
 }

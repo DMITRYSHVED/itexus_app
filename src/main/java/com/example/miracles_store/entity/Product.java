@@ -32,6 +32,8 @@ public class Product {
 
     private BigDecimal cost;
 
+    private String imageId;
+
     @ManyToOne
     @JoinColumn(name = "product_type_id")
     private ProductType productType;

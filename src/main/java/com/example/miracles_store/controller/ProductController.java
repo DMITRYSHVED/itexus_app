@@ -1,5 +1,6 @@
 package com.example.miracles_store.controller;
 
+import com.example.miracles_store.constant.enums.ImageContentType;
 import com.example.miracles_store.dto.ProductRequestDto;
 import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.dto.filter.ProductFilter;
@@ -18,12 +19,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Tag(name = "product")
 @RestController
@@ -52,8 +58,8 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<ProductResponseDto> create(@RequestBody @Validated({Default.class, CreateAction.class})
                                                      ProductRequestDto product) {
-        ProductResponseDto response = productMapper.toResponseDto(productService.
-                save(productMapper.requestDtoToEntity(product)));
+        ProductResponseDto response = productMapper.toResponseDto(productService.save(productMapper.
+                requestDtoToEntity(product)));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -62,6 +68,24 @@ public class ProductController {
                                                      ProductRequestDto productRequestDto) {
         ProductResponseDto response = productMapper.toResponseDto(productService.
                 update(productMapper.requestDtoToEntity(productRequestDto)));
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping(value = "/{productId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<ProductResponseDto> setProductImage(@PathVariable("productId") Integer productId,
+                                                              @RequestParam("imageFile") MultipartFile imageFile)
+            throws IOException {
+        if (!ImageContentType.isValidContentType(imageFile.getContentType())) {
+            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+        }
+
+        ProductResponseDto response = productMapper.toResponseDto(productService.setProductImage(productId, imageFile));
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/deleteImage/{productId}")
+    public ResponseEntity<ProductResponseDto> deleteProductImage(@PathVariable("productId") Integer productId) {
+        ProductResponseDto response = productMapper.toResponseDto(productService.deleteProductImage(productId));
         return ResponseEntity.ok(response);
     }
 

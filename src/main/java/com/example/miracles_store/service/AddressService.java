@@ -1,5 +1,6 @@
 package com.example.miracles_store.service;
 
+import com.example.miracles_store.constant.EmptyFieldConstant;
 import com.example.miracles_store.dto.filter.AddressFilter;
 import com.example.miracles_store.entity.Address;
 import com.example.miracles_store.entity.QAddress;
@@ -54,7 +55,7 @@ public class AddressService {
 
     public Address save(Address address) {
         if (StringUtils.isBlank(address.getFlat())) {
-            address.setFlat("NONE");
+            address.setFlat(EmptyFieldConstant.NONE);
         }
         return addressRepository.save(address);
     }

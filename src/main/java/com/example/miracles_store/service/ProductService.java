@@ -1,5 +1,6 @@
 package com.example.miracles_store.service;
 
+import com.example.miracles_store.constant.EmptyFieldConstant;
 import com.example.miracles_store.dto.filter.ProductFilter;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.QProduct;
@@ -13,12 +14,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class ProductService {
 
+    private final ProductImageService productImageService;
     private final ProductRepository productRepository;
 
     private final SellPositionRepository sellPositionRepository;
@@ -47,11 +52,28 @@ public class ProductService {
     }
 
     public Product save(Product product) {
+        product.setImageId(EmptyFieldConstant.NONE);
         return productRepository.save(product);
+    }
+
+    public Product setProductImage(Integer productId, MultipartFile imageFile) throws IOException {
+        Product product = getById(productId);
+        String imageId = productImageService.addProductImage(imageFile);
+
+        product.setImageId(imageId);
+        return update(product);
     }
 
     public Product update(Product product) {
         return productRepository.saveAndFlush(product);
+    }
+
+    public Product deleteProductImage(Integer productId) {
+        Product product = getById(productId);
+
+        productImageService.deleteProductImage(product.getImageId());
+        product.setImageId(EmptyFieldConstant.NONE);
+        return update(product);
     }
 
     public void deleteById(Integer id) {
