@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.Base64;
 
 @Mapper
@@ -43,11 +44,12 @@ public abstract class ProductMapper {
     }
 
     @Named("fromImageIdToEncodedImage")
-    protected String fromImageIdToEncodedImage(String imageId) {
+    protected String fromImageIdToEncodedImage(String imageId) throws IOException {
         if (imageId.equals(EmptyFieldConstant.NONE)) {
             return imageId;
         }
-        return Base64.getEncoder().encodeToString(productImageService.getProductImage(imageId).getImage().getData());
+        return Base64.getEncoder().
+                encodeToString(productImageService.getProductImage(imageId).getStream().readAllBytes());
     }
 }
 

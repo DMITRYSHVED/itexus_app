@@ -1,6 +1,5 @@
 package com.example.miracles_store.controller;
 
-import com.example.miracles_store.constant.enums.ImageContentType;
 import com.example.miracles_store.dto.ProductRequestDto;
 import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.dto.filter.ProductFilter;
@@ -15,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -73,13 +73,13 @@ public class ProductController {
 
     @PatchMapping(value = "/{productId}", consumes = {"multipart/form-data"})
     public ResponseEntity<ProductResponseDto> setProductImage(@PathVariable("productId") Integer productId,
-                                                              @RequestParam("imageFile") MultipartFile imageFile)
+                                                              @RequestParam("image") MultipartFile image)
             throws IOException {
-        if (!ImageContentType.isValidContentType(imageFile.getContentType())) {
+        if (!MediaType.IMAGE_PNG_VALUE.equals(image.getContentType()) &&
+                !MediaType.IMAGE_JPEG_VALUE.equals(image.getContentType())) {
             return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
         }
-
-        ProductResponseDto response = productMapper.toResponseDto(productService.setProductImage(productId, imageFile));
+        ProductResponseDto response = productMapper.toResponseDto(productService.setProductImage(productId, image));
         return ResponseEntity.ok(response);
     }
 
