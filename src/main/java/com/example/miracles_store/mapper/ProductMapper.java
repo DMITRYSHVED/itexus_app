@@ -1,6 +1,5 @@
 package com.example.miracles_store.mapper;
 
-import com.example.miracles_store.constant.EmptyFieldConstant;
 import com.example.miracles_store.dto.ProductRequestDto;
 import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.dto.ProductTypeDto;
@@ -8,6 +7,7 @@ import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.ProductType;
 import com.example.miracles_store.service.ProductImageService;
 import com.example.miracles_store.service.ProductTypeService;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -45,11 +45,9 @@ public abstract class ProductMapper {
 
     @Named("fromImageIdToEncodedImage")
     protected String fromImageIdToEncodedImage(String imageId) throws IOException {
-        if (imageId.equals(EmptyFieldConstant.NONE)) {
-            return imageId;
-        }
-        return Base64.getEncoder().
-                encodeToString(productImageService.getProductImage(imageId).getStream().readAllBytes());
+        return StringUtils.isBlank(imageId) ? null :
+                Base64.getEncoder()
+                        .encodeToString(productImageService.getProductImage(imageId).readAllBytes());
     }
 }
 

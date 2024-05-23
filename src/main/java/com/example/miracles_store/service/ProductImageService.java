@@ -1,6 +1,5 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.entity.ProductImage;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 @Service
 @RequiredArgsConstructor
@@ -28,15 +28,12 @@ public class ProductImageService {
         return id.toString();
     }
 
-    public ProductImage getProductImage(String id) throws IOException {
+    public InputStream getProductImage(String id) throws IOException {
         GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(id)));
-        ProductImage image = new ProductImage();
-        if (file != null) {
-            image.setStream(operations.getResource(file).getInputStream());
-        } else {
+        if (file == null) {
             throw new ObjectNotFoundException("Can't find image with id: " + id);
         }
-        return image;
+        return operations.getResource(file).getInputStream();
     }
 
     public void deleteProductImage(String id) {

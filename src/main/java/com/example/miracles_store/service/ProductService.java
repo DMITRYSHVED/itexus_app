@@ -1,6 +1,5 @@
 package com.example.miracles_store.service;
 
-import com.example.miracles_store.constant.EmptyFieldConstant;
 import com.example.miracles_store.dto.filter.ProductFilter;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.QProduct;
@@ -52,7 +51,6 @@ public class ProductService {
     }
 
     public Product save(Product product) {
-        product.setImageId(EmptyFieldConstant.NONE);
         return productRepository.save(product);
     }
 
@@ -72,7 +70,7 @@ public class ProductService {
         Product product = getById(productId);
 
         productImageService.deleteProductImage(product.getImageId());
-        product.setImageId(EmptyFieldConstant.NONE);
+        product.setImageId(null);
         return update(product);
     }
 
