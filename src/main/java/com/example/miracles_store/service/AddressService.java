@@ -7,7 +7,6 @@ import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.repository.AddressRepository;
 import com.querydsl.core.BooleanBuilder;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,16 +52,10 @@ public class AddressService {
     }
 
     public Address save(Address address) {
-        if (StringUtils.isBlank(address.getFlat())) {
-            address.setFlat("NONE");
-        }
         return addressRepository.save(address);
     }
 
     public Address update(Address address) {
-        if (StringUtils.isBlank(address.getFlat())) {
-            address.setFlat("NONE");
-        }
         return addressRepository.saveAndFlush(address);
     }
 

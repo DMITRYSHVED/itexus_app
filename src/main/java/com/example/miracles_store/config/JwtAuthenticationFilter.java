@@ -2,12 +2,14 @@ package com.example.miracles_store.config;
 
 import com.example.miracles_store.service.JwtService;
 import com.example.miracles_store.service.UserService;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -34,21 +36,27 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            String token = authHeader.substring(7);
-            String email;
+        try {
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            if ((email = jwtService.extractEmail(token)) != null) {
-                UserDetails userDetails = userService.loadUserByUsername(email);
-                if (jwtService.isTokenValid(token, userDetails)) {
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails, null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                String token = authHeader.substring(7);
+                String email;
+
+                if ((email = jwtService.extractEmail(token)) != null) {
+                    UserDetails userDetails = userService.loadUserByUsername(email);
+                    if (jwtService.isTokenValid(token, userDetails)) {
+                        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
+            filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException exception) {
+            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.getWriter().write(exception.getMessage());
         }
-        filterChain.doFilter(request, response);
     }
 }

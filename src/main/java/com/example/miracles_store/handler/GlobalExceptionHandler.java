@@ -4,6 +4,7 @@ import com.example.miracles_store.exception.NotActivePositionException;
 import com.example.miracles_store.exception.ObjectNotFoundException;
 import com.example.miracles_store.exception.OutOfStockException;
 import com.example.miracles_store.exception.ReferencedEntityException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +31,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> IllegalArgumentExceptionInfo(IllegalArgumentException exception) {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<String> ExpiredJwtExceptionInfo(ExpiredJwtException exception) {
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(NotActivePositionException.class)
@@ -52,10 +59,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
-        List<String> errors = ex.getBindingResult().getAllErrors()
+    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException exception) {
+        List<String> errors = exception.getBindingResult().getAllErrors()
                 .stream().map(ObjectError::getDefaultMessage).collect(Collectors.toList());
         return new ResponseEntity<>(getErrorsMap(errors), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<String> handleResponseStatusException(ResponseStatusException exception) {
+        return ResponseEntity.status(exception.getStatusCode()).body(exception.getReason());
     }
 
     private Map<String, List<String>> getErrorsMap(List<String> errors) {

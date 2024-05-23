@@ -5,10 +5,16 @@ import com.example.miracles_store.dto.ProductResponseDto;
 import com.example.miracles_store.dto.ProductTypeDto;
 import com.example.miracles_store.entity.Product;
 import com.example.miracles_store.entity.ProductType;
+import com.example.miracles_store.service.ProductImageService;
 import com.example.miracles_store.service.ProductTypeService;
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.util.Base64;
 
 @Mapper
 public abstract class ProductMapper {
@@ -19,7 +25,11 @@ public abstract class ProductMapper {
     @Autowired
     protected ProductTypeMapper productTypeMapper;
 
+    @Autowired
+    protected ProductImageService productImageService;
+
     @Mapping(target = "productType", source = "product.productType")
+    @Mapping(target = "encodedImage", source = "product.imageId", qualifiedByName = "fromImageIdToEncodedImage")
     public abstract ProductResponseDto toResponseDto(Product product);
 
     @Mapping(target = "productType", source = "productTypeId")
@@ -31,6 +41,13 @@ public abstract class ProductMapper {
 
     protected ProductType fromTypeIdToType(Integer productTypeId) {
         return productTypeService.getById(productTypeId);
+    }
+
+    @Named("fromImageIdToEncodedImage")
+    protected String fromImageIdToEncodedImage(String imageId) throws IOException {
+        return StringUtils.isBlank(imageId) ? null :
+                Base64.getEncoder()
+                        .encodeToString(productImageService.getProductImage(imageId).readAllBytes());
     }
 }
 
