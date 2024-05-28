@@ -5,4 +5,8 @@ databaseChangeLog:
       path: db/changelog/v2/
   - includeAll:
       path: db/changelog/v3/
+  - includeAll:
+      path: db/changelog/v4/
+  - includeAll:
+      path: db/changelog/v5/
 
