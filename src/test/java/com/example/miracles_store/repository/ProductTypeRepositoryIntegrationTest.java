@@ -7,56 +7,61 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
 @DataJpaTest
-@Transactional
-@ActiveProfiles("test")
+@Testcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class ProductTypeRepositoryTest {
+public class ProductTypeRepositoryIntegrationTest {
 
     @Autowired
     ProductTypeRepository productTypeRepository;
 
+    @Container
+    @ServiceConnection
+    static PostgreSQLContainer<?> postgresSQLContainer = new PostgreSQLContainer<>("postgres:16");
+
     @Test
-    @Sql("/sql/productTypes.sql")
     void existsByName() {
-        Assertions.assertThat(productTypeRepository.existsByName("Shoes")).isTrue();
+        assertTrue(productTypeRepository.existsByName("Shoes"));
     }
 
     @Test
-    @Sql("/sql/productTypes.sql")
     void existsByNameAndIdNotEqual() {
-        Assertions.assertThat(productTypeRepository.existsByNameAndIdNotEqual("Shoes",123)).isTrue();
+        assertTrue(productTypeRepository.existsByNameAndIdNotEqual("Shoes", 123));
     }
 
     @Test
-    @Sql("/sql/productTypes.sql")
     void findById() {
         ProductType productType = productTypeRepository.findById(2)
-                .orElseThrow( () -> new ObjectNotFoundException("Can't find productType"));
+                .orElseThrow(() -> new ObjectNotFoundException("Can't find productType"));
 
-        Assertions.assertThat(productType).isNotNull();
-        Assertions.assertThat(productType.getName()).isEqualTo("T-shirts");
+        assertNotNull(productType);
+        assertEquals(productType.getName(), "T-shirts");
     }
 
     @Test
-    @Sql("/sql/productTypes.sql")
     void findAll() {
         Pageable pageable = PageRequest.of(0, 20);
 
         Page<ProductType> productTypes = productTypeRepository.findAll(pageable);
 
-        Assertions.assertThat(productTypes).isNotNull();
-        Assertions.assertThat(productTypes.getContent().get(0).getName()).isEqualTo("Shoes");
-        Assertions.assertThat(productTypes.getContent().get(1).getName()).isEqualTo("T-shirts");
+        assertNotNull(productTypes);
+        assertEquals(productTypes.getContent().get(0).getName(), "Shoes");
+        assertEquals(productTypes.getContent().get(1).getName(), "T-shirts");
     }
 
     @Test
@@ -66,12 +71,11 @@ public class ProductTypeRepositoryTest {
 
         ProductType saved = productTypeRepository.save(productType);
 
-        Assertions.assertThat(saved).isNotNull();
-        Assertions.assertThat(saved.getName()).isEqualTo(productType.getName());
+        assertNotNull(saved);
+        assertEquals(saved.getName(), productType.getName());
     }
 
     @Test
-    @Sql("/sql/productTypes.sql")
     void update() {
         ProductType productType = new ProductType();
         productType.setId(1);
@@ -79,12 +83,11 @@ public class ProductTypeRepositoryTest {
 
         ProductType updated = productTypeRepository.saveAndFlush(productType);
 
-        Assertions.assertThat(updated).isNotNull();
-        Assertions.assertThat(updated.getName()).isEqualTo(productType.getName());
+        assertNotNull(updated);
+        assertEquals(updated.getName(), productType.getName());
     }
 
     @Test
-    @Sql("/sql/productTypes.sql")
     void deleteById() {
         productTypeRepository.deleteById(2);
 

@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: miracles_store
-  datasource:
-    url: jdbc:tc:postgresql:16:///test
-    username: test
-    password: test
