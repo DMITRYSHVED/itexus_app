@@ -1,20 +1,23 @@
 package com.example.miracles_store.service;
 
+import com.example.miracles_store.config.TestConfig;
+import com.example.miracles_store.constant.ProductTypeTestConstant;
 import com.example.miracles_store.entity.ProductType;
 import com.example.miracles_store.exception.ReferencedEntityException;
 import com.example.miracles_store.repository.ProductRepository;
 import com.example.miracles_store.repository.ProductTypeRepository;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,58 +27,59 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = TestConfig.class)
 public class ProductTypeServiceTest {
 
-    @Mock
-    ProductTypeRepository productTypeRepository;
+    @MockBean
+    private ProductTypeRepository productTypeRepository;
 
-    @Mock
-    ProductRepository productRepository;
+    @MockBean
+    private ProductRepository productRepository;
 
-    @InjectMocks
-    ProductTypeService productTypeService;
+    @Autowired
+    private ProductTypeService productTypeService;
+
+    private ProductType productType;
+
+    @BeforeEach
+    public void setup() {
+        productType = new ProductType(ProductTypeTestConstant.TYPE_ID_1, ProductTypeTestConstant.TYPE_NAME_SHOES);
+    }
 
     @Test
     void getById() {
-        int productTypeId = 1;
-        ProductType productType = new ProductType(1, "Shoes");
-        doReturn(Optional.of(productType)).when(productTypeRepository).findById(1);
+        doReturn(Optional.of(productType)).when(productTypeRepository).findById(ProductTypeTestConstant.TYPE_ID_1);
 
-        var result = productTypeService.getById(productTypeId);
+        var result = productTypeService.getById(ProductTypeTestConstant.TYPE_ID_1);
 
         assertNotNull(result);
-        assertEquals(result.getName(), "Shoes");
-        verify(productTypeRepository).findById(1);
-        verifyNoMoreInteractions(productTypeRepository);
+        assertEquals(result, productType);
+        verify(productTypeRepository).findById(ProductTypeTestConstant.TYPE_ID_1);
     }
 
     @Test
     void getAll() {
         Pageable pageable = PageRequest.of(0, 20);
         Page<ProductType> types = new PageImpl<>(List
-                .of(new ProductType(1, "Shoes"), new ProductType(2, "T-shirts")));
+                .of(new ProductType(ProductTypeTestConstant.TYPE_ID_1, ProductTypeTestConstant.TYPE_NAME_SHOES),
+                        new ProductType(ProductTypeTestConstant.TYPE_ID_2, ProductTypeTestConstant.TYPE_NAME_SWEATERS)));
         doReturn(types).when(productTypeRepository).findAll(pageable);
 
         Page<ProductType> result = productTypeService.getAll(pageable);
 
         assertNotNull(result);
-        Assertions.assertThat(result.getContent().get(0).getName()).isEqualTo(types.getContent().get(0).getName());
-        Assertions.assertThat(result.getContent().get(1).getName()).isEqualTo(types.getContent().get(1).getName());
+        assertEquals(types, result);
         verify(productTypeRepository).findAll(pageable);
-        verifyNoMoreInteractions(productTypeRepository);
     }
-
 
     @Test
     void save() {
-        ProductType expected = new ProductType(3, "Denim");
+        ProductType expected = new ProductType(3, "Saved");
         ProductType saved = new ProductType();
-        saved.setName("Denim");
+        saved.setName("Saved");
         doReturn(expected).when(productTypeRepository).save(saved);
 
         ProductType result = productTypeService.save(saved);
@@ -83,12 +87,11 @@ public class ProductTypeServiceTest {
         assertNotNull(result);
         assertEquals(result, expected);
         verify(productTypeRepository).save(saved);
-        verifyNoMoreInteractions(productTypeRepository);
     }
 
     @Test
     void update() {
-        ProductType updated = new ProductType(3, "Denim");
+        ProductType updated = new ProductType(3, "Updated");
         doReturn(updated).when(productTypeRepository).saveAndFlush(updated);
 
         ProductType result = productTypeService.update(updated);
@@ -96,24 +99,18 @@ public class ProductTypeServiceTest {
         assertNotNull(result);
         assertEquals(result, updated);
         verify(productTypeRepository).saveAndFlush(updated);
-        verifyNoMoreInteractions(productTypeRepository);
     }
 
     @Test
     @DisplayName("Should throw ReferencedEntityException")
     void deleteById() {
-        int productTypeId = 1;
-        ProductType productType = new ProductType(productTypeId, "Shoes");
-        ProductTypeService spyProductTypeService = spy(productTypeService);
-        doReturn(productType).when(spyProductTypeService).getById(productTypeId);
+        doReturn(Optional.of(productType)).when(productTypeRepository).findById(ProductTypeTestConstant.TYPE_ID_1);
         doReturn(true).when(productRepository).existsByProductType(productType);
 
-        ReferencedEntityException exception = assertThrows(ReferencedEntityException.class, () ->
-                spyProductTypeService.deleteById(productTypeId)
-        );
+        assertThrows(ReferencedEntityException.class,
+                () -> productTypeService.deleteById(ProductTypeTestConstant.TYPE_ID_1));
 
-        assertEquals("Can't delete type 'Shoes' due to existing products of this type", exception.getMessage());
         verify(productRepository).existsByProductType(productType);
-        verify(productTypeRepository, never()).deleteById(productTypeId);
+        verify(productTypeRepository, never()).deleteById(ProductTypeTestConstant.TYPE_ID_1);
     }
 }

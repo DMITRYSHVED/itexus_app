@@ -1,10 +1,11 @@
 package com.example.miracles_store.controller;
 
 import com.example.miracles_store.config.TestConfig;
+import com.example.miracles_store.constant.ProductTypeTestConstant;
 import com.example.miracles_store.dto.ProductTypeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.skyscreamer.jsonassert.JSONAssert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.List;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
@@ -39,29 +41,36 @@ public class ProductTypeControllerIntegrationTest {
     static PostgreSQLContainer<?> postgresSQLContainer = new PostgreSQLContainer<>("postgres:16");
 
     @Test
+    @WithMockUser(username = "Tester", authorities = "ROLE_USER")
+    void testUserRoleIsForbidden() throws Exception {
+        mockMvc.perform(get(ProductTypeTestConstant.URL))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void getAll() throws Exception {
-        List<ProductTypeDto> productTypes = List
-                .of(new ProductTypeDto(1, "Shoes"), new ProductTypeDto(2, "T-shirts"));
-        String expected = objectMapper.writeValueAsString(productTypes);
+        String expected = objectMapper.writeValueAsString(List.of(new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_1,
+                ProductTypeTestConstant.TYPE_NAME_SHOES), new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_2,
+                ProductTypeTestConstant.TYPE_NAME_SWEATERS)));
 
         String result = objectMapper.writeValueAsString(objectMapper
-                .readTree(mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/productTypes"))
+                .readTree(mockMvc.perform(get(ProductTypeTestConstant.URL))
                         .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("content"));
 
-        JSONAssert.assertEquals(expected, result, false);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void getById() throws Exception {
-        int productTypeId = 2;
-        String expected = objectMapper.writeValueAsString(new ProductTypeDto(2, "T-shirts"));
+        String expected = objectMapper.writeValueAsString(new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_2,
+                ProductTypeTestConstant.TYPE_NAME_SWEATERS));
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/productTypes/" + productTypeId))
+        String result = mockMvc.perform(get(ProductTypeTestConstant.URL_TYPE_ID_2))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        JSONAssert.assertEquals(expected, result, false);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
@@ -73,32 +82,30 @@ public class ProductTypeControllerIntegrationTest {
         productTypeDto.setId(3);
         String expected = objectMapper.writeValueAsString(productTypeDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/productTypes")
+        String result = mockMvc.perform(MockMvcRequestBuilders.post(ProductTypeTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpectAll(status().isCreated()).andReturn().getResponse().getContentAsString();
 
-        JSONAssert.assertEquals(expected, result, false);
+        Assertions.assertEquals(expected, result);
     }
 
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void update() throws Exception {
-        ProductTypeDto productTypeDto = new ProductTypeDto(1, "Updated");
+        ProductTypeDto productTypeDto = new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_1, "Updated");
         String requestObject = objectMapper.writeValueAsString(productTypeDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/productTypes")
+        String result = mockMvc.perform(MockMvcRequestBuilders.put(ProductTypeTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        JSONAssert.assertEquals(requestObject, result, true);
+        Assertions.assertEquals(requestObject, result);
     }
 
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void delete() throws Exception {
-        int productTypeId = 2;
-
-        mockMvc.perform(MockMvcRequestBuilders.delete("/api/v1/productTypes/" + productTypeId))
+        mockMvc.perform(MockMvcRequestBuilders.delete(ProductTypeTestConstant.URL_TYPE_ID_2))
                 .andExpect(status().isOk());
     }
 }
