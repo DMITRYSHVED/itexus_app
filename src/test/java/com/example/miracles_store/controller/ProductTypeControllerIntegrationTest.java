@@ -5,6 +5,8 @@ import com.example.miracles_store.constant.ProductTypeTestConstant;
 import com.example.miracles_store.dto.ProductTypeDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,9 +38,20 @@ public class ProductTypeControllerIntegrationTest {
     @Autowired
     ObjectMapper objectMapper;
 
+    ProductTypeDto shoesTypeDto;
+
+    ProductTypeDto sweatersTypeDto;
+
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgresSQLContainer = new PostgreSQLContainer<>("postgres:16");
+
+    @BeforeEach
+    void setUp() {
+        shoesTypeDto = new ProductTypeDto(ProductTypeTestConstant.SHOES_TYPE_ID, ProductTypeTestConstant.TYPE_NAME_SHOES);
+
+        sweatersTypeDto = new ProductTypeDto(ProductTypeTestConstant.SWEATERS_TYPE_ID, ProductTypeTestConstant.TYPE_NAME_SWEATERS);
+    }
 
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_USER")
@@ -50,9 +63,7 @@ public class ProductTypeControllerIntegrationTest {
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void getAll() throws Exception {
-        String expected = objectMapper.writeValueAsString(List.of(new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_1,
-                ProductTypeTestConstant.TYPE_NAME_SHOES), new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_2,
-                ProductTypeTestConstant.TYPE_NAME_SWEATERS)));
+        String expected = objectMapper.writeValueAsString(List.of(shoesTypeDto, sweatersTypeDto));
 
         String result = objectMapper.writeValueAsString(objectMapper
                 .readTree(mockMvc.perform(get(ProductTypeTestConstant.URL))
@@ -64,11 +75,11 @@ public class ProductTypeControllerIntegrationTest {
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void getById() throws Exception {
-        String expected = objectMapper.writeValueAsString(new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_2,
-                ProductTypeTestConstant.TYPE_NAME_SWEATERS));
+        String expected = objectMapper.writeValueAsString(sweatersTypeDto);
 
-        String result = mockMvc.perform(get(ProductTypeTestConstant.URL_TYPE_ID_2))
-                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String result = mockMvc.perform(get(ProductTypeTestConstant.URL + "/" +
+                        ProductTypeTestConstant.SWEATERS_TYPE_ID)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
 
         Assertions.assertEquals(expected, result);
     }
@@ -92,7 +103,7 @@ public class ProductTypeControllerIntegrationTest {
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
     void update() throws Exception {
-        ProductTypeDto productTypeDto = new ProductTypeDto(ProductTypeTestConstant.TYPE_ID_1, "Updated");
+        ProductTypeDto productTypeDto = new ProductTypeDto(shoesTypeDto.getId(), "Updated");
         String requestObject = objectMapper.writeValueAsString(productTypeDto);
 
         String result = mockMvc.perform(MockMvcRequestBuilders.put(ProductTypeTestConstant.URL)
@@ -104,8 +115,9 @@ public class ProductTypeControllerIntegrationTest {
 
     @Test
     @WithMockUser(username = "Tester", authorities = "ROLE_ADMIN")
+    @DisplayName("Throws ReferencedEntityException")
     void delete() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.delete(ProductTypeTestConstant.URL_TYPE_ID_2))
-                .andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.delete(ProductTypeTestConstant.URL + "/" +
+                ProductTypeTestConstant.SHOES_TYPE_ID)).andExpect(status().isBadRequest());
     }
 }
