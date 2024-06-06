@@ -65,11 +65,11 @@ public class ProductTypeControllerIntegrationTest {
     void getAll() throws Exception {
         String expected = objectMapper.writeValueAsString(List.of(shoesTypeDto, sweatersTypeDto));
 
-        String result = objectMapper.writeValueAsString(objectMapper
+        String actual = objectMapper.writeValueAsString(objectMapper
                 .readTree(mockMvc.perform(get(ProductTypeTestConstant.URL))
                         .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("content"));
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -77,11 +77,11 @@ public class ProductTypeControllerIntegrationTest {
     void getById() throws Exception {
         String expected = objectMapper.writeValueAsString(sweatersTypeDto);
 
-        String result = mockMvc.perform(get(ProductTypeTestConstant.URL + "/" +
+        String actual = mockMvc.perform(get(ProductTypeTestConstant.URL + "/" +
                         ProductTypeTestConstant.SWEATERS_TYPE_ID)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -93,11 +93,11 @@ public class ProductTypeControllerIntegrationTest {
         productTypeDto.setId(3);
         String expected = objectMapper.writeValueAsString(productTypeDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.post(ProductTypeTestConstant.URL)
+        String actual = mockMvc.perform(MockMvcRequestBuilders.post(ProductTypeTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpectAll(status().isCreated()).andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -106,11 +106,11 @@ public class ProductTypeControllerIntegrationTest {
         ProductTypeDto productTypeDto = new ProductTypeDto(shoesTypeDto.getId(), "Updated");
         String requestObject = objectMapper.writeValueAsString(productTypeDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.put(ProductTypeTestConstant.URL)
+        String actual = mockMvc.perform(MockMvcRequestBuilders.put(ProductTypeTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(requestObject, result);
+        Assertions.assertEquals(requestObject, actual);
     }
 
     @Test

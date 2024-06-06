@@ -76,21 +76,21 @@ public class SellPositionControllerIntegrationTest {
     void getAll() throws Exception {
         String expected = objectMapper.writeValueAsString(List.of(airForcePositionResponseDto, sweaterPositionResponseDto));
 
-        String result = objectMapper.writeValueAsString(objectMapper.readTree(mockMvc.perform(get(SellPositionTestConstant.URL))
+        String actual = objectMapper.writeValueAsString(objectMapper.readTree(mockMvc.perform(get(SellPositionTestConstant.URL))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("content"));
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
     void getById() throws Exception {
         String expected = objectMapper.writeValueAsString(sweaterPositionResponseDto);
 
-        String result = mockMvc.perform(get(SellPositionTestConstant.URL + "/" +
+        String actual = mockMvc.perform(get(SellPositionTestConstant.URL + "/" +
                         SellPositionTestConstant.SWEATER_POSITION_ID)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -103,11 +103,11 @@ public class SellPositionControllerIntegrationTest {
         String requestObject = objectMapper.writeValueAsString(sellPositionRequestDto);
         String expected = objectMapper.writeValueAsString(sellPositionResponseDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.post(SellPositionTestConstant.URL)
+        String actual = mockMvc.perform(MockMvcRequestBuilders.post(SellPositionTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpectAll(status().isCreated()).andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -121,10 +121,10 @@ public class SellPositionControllerIntegrationTest {
         String requestObject = objectMapper.writeValueAsString(sellPositionRequestDto);
         String expected = objectMapper.writeValueAsString(sellPositionResponseDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.put(SellPositionTestConstant.URL)
+        String actual = mockMvc.perform(MockMvcRequestBuilders.put(SellPositionTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 }

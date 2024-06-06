@@ -79,10 +79,10 @@ public class ProductControllerIntegrationTest {
     void getAll() throws Exception {
         String expected = objectMapper.writeValueAsString(List.of(airForceResponseDto, sweaterResponseDto));
 
-        String result = objectMapper.writeValueAsString(objectMapper.readTree(mockMvc.perform(get(ProductTestConstant.URL))
+        String actual = objectMapper.writeValueAsString(objectMapper.readTree(mockMvc.perform(get(ProductTestConstant.URL))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString()).get("content"));
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -90,11 +90,11 @@ public class ProductControllerIntegrationTest {
     void getById() throws Exception {
         String expected = objectMapper.writeValueAsString(sweaterResponseDto);
 
-        String result = mockMvc.perform(get(ProductTestConstant.URL + "/" +
+        String actual = mockMvc.perform(get(ProductTestConstant.URL + "/" +
                         ProductTestConstant.SWEATER_PRODUCT_ID)).andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -108,11 +108,11 @@ public class ProductControllerIntegrationTest {
         String requestObject = objectMapper.writeValueAsString(productRequestDto);
         String expected = objectMapper.writeValueAsString(productResponseDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.post(ProductTestConstant.URL)
+        String actual = mockMvc.perform(MockMvcRequestBuilders.post(ProductTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpectAll(status().isCreated()).andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -126,11 +126,11 @@ public class ProductControllerIntegrationTest {
         String requestObject = objectMapper.writeValueAsString(productRequestDto);
         String expected = objectMapper.writeValueAsString(productResponseDto);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.put(ProductTestConstant.URL)
+        String actual = mockMvc.perform(MockMvcRequestBuilders.put(ProductTestConstant.URL)
                         .contentType(MediaType.APPLICATION_JSON).content(requestObject))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -142,13 +142,13 @@ public class ProductControllerIntegrationTest {
         airForceResponseDto.setEncodedImage(Base64.getEncoder().encodeToString(image.getInputStream().readAllBytes()));
         String expected = objectMapper.writeValueAsString(expectedResponse);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.multipart(ProductTestConstant.URL + "/" +
+        String actual = mockMvc.perform(MockMvcRequestBuilders.multipart(ProductTestConstant.URL + "/" +
                                 ProductTestConstant.AIR_FORCE_PRODUCT_ID).file(image)
                         .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test
@@ -157,12 +157,12 @@ public class ProductControllerIntegrationTest {
         ProductResponseDto expectedResponse = sweaterResponseDto;
         String expected = objectMapper.writeValueAsString(expectedResponse);
 
-        String result = mockMvc.perform(MockMvcRequestBuilders.delete(ProductTestConstant.URL + "/deleteImage/" +
+        String actual = mockMvc.perform(MockMvcRequestBuilders.delete(ProductTestConstant.URL + "/deleteImage/" +
                         ProductTestConstant.SWEATER_PRODUCT_ID).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn().getResponse().getContentAsString();
 
-        Assertions.assertEquals(expected, result);
+        Assertions.assertEquals(expected, actual);
     }
 
     @Test

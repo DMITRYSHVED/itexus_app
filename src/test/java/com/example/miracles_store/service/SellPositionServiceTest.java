@@ -58,11 +58,12 @@ public class SellPositionServiceTest {
 
     @Test
     void getById() {
+        SellPosition expected = sweaterPosition;
         doReturn(Optional.of(sweaterPosition)).when(sellPositionRepository).findById(sweaterPosition.getId());
 
-        var result = sellPositionService.getById(sweaterPosition.getId());
+        var actual = sellPositionService.getById(sweaterPosition.getId());
 
-        assertEquals(result, sweaterPosition);
+        assertEquals(expected, actual);
         verify(sellPositionRepository).findById(sweaterPosition.getId());
     }
 
@@ -71,36 +72,36 @@ public class SellPositionServiceTest {
         SellPositionFilter sellPositionFilter =
                 new SellPositionFilter(airForcePosition.getId(), null, null, null);
         Pageable pageable = PageRequest.of(0, 20);
-        Page<SellPosition> expectedPositions = new PageImpl<>(List.of(airForcePosition));
-        doReturn(expectedPositions).when(sellPositionRepository).findAll(any(Predicate.class), any(Pageable.class));
+        Page<SellPosition> expected = new PageImpl<>(List.of(airForcePosition));
+        doReturn(expected).when(sellPositionRepository).findAll(any(Predicate.class), any(Pageable.class));
 
-        Page<SellPosition> result = sellPositionService.getAll(sellPositionFilter, pageable);
+        Page<SellPosition> actual = sellPositionService.getAll(sellPositionFilter, pageable);
 
-        assertEquals(expectedPositions, result);
+        assertEquals(expected, actual);
         verify(sellPositionRepository).findAll(any(Predicate.class), any(Pageable.class));
     }
 
     @Test
     void save() {
-        SellPosition savedPosition = new SellPosition();
-        doReturn(savedPosition).when(sellPositionRepository).save(savedPosition);
+        SellPosition expected = new SellPosition();
+        doReturn(expected).when(sellPositionRepository).save(expected);
 
-        SellPosition result = sellPositionService.save(savedPosition);
+        SellPosition actual = sellPositionService.save(expected);
 
-        assertEquals(result, savedPosition);
-        verify(sellPositionRepository).save(savedPosition);
+        assertEquals(expected, actual);
+        verify(sellPositionRepository).save(expected);
     }
 
     @Test
     void update() {
-        SellPosition updatedSellPosition = sweaterPosition;
-        updatedSellPosition.setSize("Updated");
-        doReturn(updatedSellPosition).when(sellPositionRepository).saveAndFlush(updatedSellPosition);
+        SellPosition expected = sweaterPosition;
+        expected.setSize("Updated");
+        doReturn(expected).when(sellPositionRepository).saveAndFlush(expected);
 
-        SellPosition result = sellPositionService.update(updatedSellPosition);
+        SellPosition actual = sellPositionService.update(expected);
 
-        assertEquals(result, updatedSellPosition);
-        verify(sellPositionRepository).saveAndFlush(updatedSellPosition);
+        assertEquals(expected, actual);
+        verify(sellPositionRepository).saveAndFlush(expected);
     }
 
     @Test

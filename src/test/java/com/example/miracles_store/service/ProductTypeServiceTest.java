@@ -49,47 +49,48 @@ public class ProductTypeServiceTest {
 
     @Test
     void getById() {
+        ProductType expected = shoesType;
         doReturn(Optional.of(shoesType)).when(productTypeRepository).findById(shoesType.getId());
 
-        var result = productTypeService.getById(shoesType.getId());
+        var actual = productTypeService.getById(shoesType.getId());
 
-        assertEquals(result, shoesType);
+        assertEquals(expected, actual);
         verify(productTypeRepository).findById(shoesType.getId());
     }
 
     @Test
     void getAll() {
         Pageable pageable = PageRequest.of(0, 20);
-        Page<ProductType> expectedTypes = new PageImpl<>(List.of(shoesType));
-        doReturn(expectedTypes).when(productTypeRepository).findAll(pageable);
+        Page<ProductType> expected = new PageImpl<>(List.of(shoesType));
+        doReturn(expected).when(productTypeRepository).findAll(pageable);
 
-        Page<ProductType> result = productTypeService.getAll(pageable);
+        Page<ProductType> actual = productTypeService.getAll(pageable);
 
-        assertEquals(expectedTypes, result);
+        assertEquals(expected, actual);
         verify(productTypeRepository).findAll(pageable);
     }
 
     @Test
     void save() {
-        ProductType savedType = new ProductType();
-        doReturn(savedType).when(productTypeRepository).save(savedType);
+        ProductType expected = new ProductType();
+        doReturn(expected).when(productTypeRepository).save(expected);
 
-        ProductType result = productTypeService.save(savedType);
+        ProductType actual = productTypeService.save(expected);
 
-        assertEquals(result, savedType);
-        verify(productTypeRepository).save(savedType);
+        assertEquals(expected, actual);
+        verify(productTypeRepository).save(expected);
     }
 
     @Test
     void update() {
-        ProductType updatedType = shoesType;
-        updatedType.setName("Updated");
-        doReturn(updatedType).when(productTypeRepository).saveAndFlush(updatedType);
+        ProductType expected = shoesType;
+        expected.setName("Updated");
+        doReturn(expected).when(productTypeRepository).saveAndFlush(expected);
 
-        ProductType result = productTypeService.update(updatedType);
+        ProductType actual = productTypeService.update(expected);
 
-        assertEquals(result, updatedType);
-        verify(productTypeRepository).saveAndFlush(updatedType);
+        assertEquals(expected, actual);
+        verify(productTypeRepository).saveAndFlush(expected);
     }
 
     @Test

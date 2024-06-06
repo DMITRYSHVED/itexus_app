@@ -71,11 +71,12 @@ public class ProductServiceTest {
 
     @Test
     void getById() {
+        Product expected = airForceProduct;
         doReturn(Optional.of(airForceProduct)).when(productRepository).findById(airForceProduct.getId());
 
-        var result = productService.getById(airForceProduct.getId());
+        var actual = productService.getById(airForceProduct.getId());
 
-        assertEquals(result, sweaterProduct);
+        assertEquals(expected, actual);
         verify(productRepository).findById(airForceProduct.getId());
     }
 
@@ -83,36 +84,36 @@ public class ProductServiceTest {
     void getAll() {
         ProductFilter productFilter = new ProductFilter(airForceProduct.getName(), null, null);
         Pageable pageable = PageRequest.of(0, 20);
-        Page<Product> expectedProducts = new PageImpl<>(List.of(airForceProduct));
-        doReturn(expectedProducts).when(productRepository).findAll(any(Predicate.class), any(Pageable.class));
+        Page<Product> expected = new PageImpl<>(List.of(airForceProduct));
+        doReturn(expected).when(productRepository).findAll(any(Predicate.class), any(Pageable.class));
 
-        Page<Product> result = productService.getAll(productFilter, pageable);
+        Page<Product> actual = productService.getAll(productFilter, pageable);
 
-        assertEquals(expectedProducts, result);
+        assertEquals(expected, actual);
         verify(productRepository).findAll(any(Predicate.class), any(Pageable.class));
     }
 
     @Test
     void save() {
-        Product savedProduct = new Product();
-        doReturn(savedProduct).when(productRepository).save(savedProduct);
+        Product expected = new Product();
+        doReturn(expected).when(productRepository).save(expected);
 
-        Product result = productService.save(savedProduct);
+        Product actual = productService.save(expected);
 
-        assertEquals(result, savedProduct);
-        verify(productRepository).save(savedProduct);
+        assertEquals(expected, actual);
+        verify(productRepository).save(expected);
     }
 
     @Test
     void update() {
-        Product updatedProduct = airForceProduct;
-        updatedProduct.setDescription("Updated");
-        doReturn(updatedProduct).when(productRepository).saveAndFlush(updatedProduct);
+        Product expected = airForceProduct;
+        expected.setDescription("Updated");
+        doReturn(expected).when(productRepository).saveAndFlush(expected);
 
-        Product result = productService.update(updatedProduct);
+        Product result = productService.update(expected);
 
-        assertEquals(result, updatedProduct);
-        verify(productRepository).saveAndFlush(updatedProduct);
+        assertEquals(expected, result);
+        verify(productRepository).saveAndFlush(expected);
     }
 
     @Test
@@ -130,17 +131,17 @@ public class ProductServiceTest {
 
     @Test
     void setProductImage() throws IOException {
-        Product updatedProduct = sweaterProduct;
-        updatedProduct.setImageId(imageId);
+        Product expected = sweaterProduct;
+        expected.setImageId(imageId);
         MockMultipartFile imageFile = new MockMultipartFile("image", "image.jpg",
                 "image/jpeg", new byte[]{1, 2, 3, 4});
         doReturn(Optional.of(sweaterProduct)).when(productRepository).findById(sweaterProduct.getId());
-        doReturn(updatedProduct.getImageId()).when(productImageService).addProductImage(any(MockMultipartFile.class));
-        doReturn(updatedProduct).when(productRepository).saveAndFlush(updatedProduct);
+        doReturn(expected.getImageId()).when(productImageService).addProductImage(any(MockMultipartFile.class));
+        doReturn(expected).when(productRepository).saveAndFlush(expected);
 
-        Product result = productService.setProductImage(sweaterProduct.getId(), imageFile);
+        Product actual = productService.setProductImage(sweaterProduct.getId(), imageFile);
 
-        assertEquals(updatedProduct, result);
+        assertEquals(expected, actual);
         verify(productRepository).findById(sweaterProduct.getId());
         verify(productImageService).addProductImage(imageFile);
         verify(productRepository).saveAndFlush(sweaterProduct);
