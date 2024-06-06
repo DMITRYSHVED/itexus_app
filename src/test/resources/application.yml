@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: miracles_store
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  liquibase:
+    change-log: db/changelog/changelog.yml
+  sql:
+    init:
+      mode: always

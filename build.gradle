@@ -28,6 +28,7 @@ compileJava {
     ]
 }
 
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -35,7 +36,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-
     implementation 'com.google.guava:guava:33.2.0-jre'
     implementation 'redis.clients:jedis:5.1.2'
     implementation 'io.jsonwebtoken:jjwt:0.12.5'
@@ -52,11 +52,17 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
+    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.testcontainers:postgresql'
+    testImplementation 'org.testcontainers:junit-jupiter'
     testCompileOnly 'org.projectlombok:lombok:1.18.30'
 }
 
+configurations {
+    testImplementation.exclude group: 'com.vaadin.external.google', module: 'android-json'
+}
 
 tasks.named('test') {
     useJUnitPlatform()
