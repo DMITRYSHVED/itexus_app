@@ -7,9 +7,15 @@ plugins {
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
-java {
-    sourceCompatibility = '21'
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.example.miracles_store.MiraclesStoreApplication'
+        )
+    }
 }
+
+
 
 configurations {
     compileOnly {
@@ -65,4 +71,9 @@ configurations {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.register("downloadLibs", Copy) {
+    from(configurations.named("runtimeClasspath"))
+    into(project.layout.buildDirectory.dir("dependency"))
 }

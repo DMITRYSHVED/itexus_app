@@ -1,7 +1,23 @@
-FROM openjdk:21
+FROM gradle:8.6-jdk as build
 
-WORKDIR /app
+WORKDIR /build
 
 COPY . .
+COPY build.gradle build.gradle
+COPY settings.gradle settings.gradle
+COPY gradlew ./
 
-CMD ["java", "-jar", "build/libs/miracles_store-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=container", "--server.port=8080", "--server.address=0.0.0.0"]
+RUN gradle clean bootJar downloadLibs
+
+FROM openjdk:21
+
+ARG JAR_FILE=miracles_store-0.0.1-SNAPSHOT.jar
+
+WORKDIR /application
+
+COPY --from=build /build/build/libs/${JAR_FILE} application.jar
+COPY --from=build /build/build/dependency lib
+
+ENTRYPOINT exec java ${JAVA_OPTS} -cp lib/*:application.jar com.example.miracles_store.MiraclesStoreApplication ${0} ${@}
+
+
