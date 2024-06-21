@@ -9,9 +9,13 @@ spring:
       host: mongodb
       port: 27017
       database: product_images
+    redis:
+      host: redis
+      port: 6379
 
   servlet:
     multipart:
       enabled: true
       max-file-size: 256MB
       max-request-size: 256MB
+

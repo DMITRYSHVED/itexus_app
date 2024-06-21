@@ -15,7 +15,6 @@ services:
     environment:
       JAVA_OPTS: "-Xms512m -Xmx1024m"
       SPRING_PROFILES_ACTIVE: "container"
-    command: [ "--spring.profiles.active=container", "--server.address=0.0.0.0" ]
 
   db:
     image: postgres:16.0
