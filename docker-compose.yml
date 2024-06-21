@@ -1,9 +1,23 @@
 version: '3.9'
 
 services:
+  miracles_store:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_OPTS: "-Xms512m -Xmx1024m"
+      SPRING_PROFILES_ACTIVE: "container"
+
   db:
     image: postgres:16.0
-
     ports:
       - "5432:5432"
     volumes:
@@ -13,14 +27,23 @@ services:
       POSTGRES_USER: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:6.2
-
     ports:
-    - "6379:6379"
+      - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   mongodb:
     image: mongo
@@ -29,8 +52,14 @@ services:
       - "27017:27017"
     volumes:
       - mongodb_data:/data/db
+    healthcheck:
+      test: [ "CMD-SHELL", "echo 'db.runCommand(\"ping\").ok'" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
   redis_data:
   mongodb_data:
+
