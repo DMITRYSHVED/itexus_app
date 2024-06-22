@@ -58,8 +58,21 @@ services:
       timeout: 5s
       retries: 5
 
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: always
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+    environment:
+      JENKINS_OPTS: --prefix=/jenkins
+
 volumes:
   postgres_data:
   redis_data:
   mongodb_data:
+  jenkins_home:
 
