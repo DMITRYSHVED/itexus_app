@@ -1,6 +1,12 @@
 pipeline {
     agent none
     stages {
+        stage('Checkout') {
+            steps {
+                // Проверка кода из репозитория
+                checkout scm
+            }
+        }
         stage('Build') {
             agent {
                 docker {
