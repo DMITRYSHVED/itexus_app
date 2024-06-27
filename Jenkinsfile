@@ -10,6 +10,7 @@ pipeline {
             }
             steps {
                 echo 'Hello, Gradle'
+                sh 'chmod +x ./gradlew' // Устанавливаем права на выполнение
                 sh './gradlew clean build -x test'
             }
         }
@@ -27,6 +28,7 @@ pipeline {
         }
     }
 }
+
 
 
 
