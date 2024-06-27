@@ -1,29 +1,33 @@
 pipeline {
-    agent none 
+    agent {
+        docker {
+            image 'gradle:latest' // Укажите образ Docker, который будете использовать
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Проброс Docker сокета
+        }
+    }
     stages {
         stage('Build') {
-            agent {
-                docker {
-                    image 'gradle:8.6-jdk21'
-                    args '-u root:root' 
-                }
-            }
             steps {
-                echo 'Hello, Gradle'
-                sh './gradlew clean build -x test'
+                sh 'gradle clean build'
             }
         }
-        stage('Run') {
-            agent {
-                docker {
-                    image 'openjdk:21'
-                    args '-u root:root' 
+        stage('Test') {
+            steps {
+                sh 'gradle test'
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                script {
+                    docker.build("my-spring-boot-app:${env.BUILD_ID}")
                 }
             }
+        }
+        stage('Deploy') {
             steps {
-                echo 'Hello, JDK'
-                // run app
+                sh "docker run -d -p 8080:8080 my-spring-boot-app:${env.BUILD_ID}"
             }
         }
     }
 }
+
