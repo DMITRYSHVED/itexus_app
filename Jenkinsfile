@@ -22,7 +22,7 @@ pipeline {
             }
             steps {
                 echo 'Hello, JDK'
-                // sh 'java -jar build/libs/demodocker-0.0.1-SNAPSHOT.jar'
+                // run app
             }
         }
     }
