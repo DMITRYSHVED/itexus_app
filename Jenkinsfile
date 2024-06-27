@@ -4,7 +4,7 @@ pipeline {
         stage('Build') {
             agent {
                 docker {
-                    image 'gradle:8.6-jdk21'
+                    image 'gradle:8.6-jdk21' // Образ с Gradle и JDK 21
                     args '-u root:root'
                 }
             }
@@ -17,17 +17,18 @@ pipeline {
         stage('Run') {
             agent {
                 docker {
-                    image 'openjdk:21'
+                    image 'openjdk:21' // Образ с JDK 21
                     args '-u root:root'
                 }
             }
             steps {
                 echo 'Hello, JDK'
-                // run app
+                // Здесь можно добавить команды для запуска приложения
             }
         }
     }
 }
+
 
 
 
