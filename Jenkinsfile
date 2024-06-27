@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image 'gradle:latest' // Укажите образ Docker, который будете использовать
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // Проброс Docker сокета
+            image 'gradle:latest'
+            args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
     stages {
