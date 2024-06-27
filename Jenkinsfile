@@ -1,11 +1,12 @@
 pipeline {
     agent none
     stages {
-        stage('Checkout') {
-            agent any
+        stage('Git Checkout') {
             steps {
-                // Проверка кода из репозитория
-                checkout scm
+                script {
+                    git branch: 'master',
+                        url: 'https://github.com/DMITRYSHVED/itexus_app'
+                }
             }
         }
         stage('Build') {
