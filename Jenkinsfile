@@ -14,10 +14,6 @@ pipeline {
                     args '-u root:root'
                 }
             }
-            // environment {
-            //     JAVA_HOME = "/usr/lib/jvm/java-21-openjdk" // Установите правильный путь к JDK
-            //     PATH = "$JAVA_HOME/bin:$PATH"
-            // }
             steps {
                 echo 'Hello, Gradle'
                 sh 'chmod +x ./gradlew' // Устанавливаем права на выполнение
@@ -31,17 +27,18 @@ pipeline {
                     args '-u root:root'
                 }
             }
-            environment {
-                JAVA_HOME = "/usr/lib/jvm/java-21-openjdk" // Установите правильный путь к JDK
-                PATH = "$JAVA_HOME/bin:$PATH"
-            }
             steps {
+                script {
+                    def javaHome = sh(script: "docker run --rm openjdk:21 sh -c 'echo \$JAVA_HOME'", returnStdout: true).trim()
+                    echo "JAVA_HOME is set to: ${javaHome}"
+                }
                 echo 'Hello, JDK'
                 // Здесь можно добавить команды для запуска приложения
             }
         }
     }
 }
+
 
 
 
