@@ -13,17 +13,15 @@ pipeline {
                 docker {
                     image 'docker:latest' // Используем Docker образ
                     args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
-                    // Указываем Dockerfile в корне проекта
-                    dockerfile {
-                        filename 'Dockerfile'
-                    }
                 }
             }
             steps {
                 script {
-                    def appName = "miracles_store"
-                    def imageName = "dmitryshved/${appName}:${env.BUILD_ID}"
-                    sh "docker build -t ${imageName} ."
+                    def imageName = "dmitryshved/miracles_store:${env.BUILD_ID}"
+                    def dockerfile = "Dockerfile"  // Замените на путь к вашему Dockerfile
+                    
+                    // Собираем Docker образ
+                    docker.build(imageName, "-f ${dockerfile} .")
                 }
             }
         }
