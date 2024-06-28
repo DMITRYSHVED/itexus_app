@@ -7,24 +7,28 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Build') {
-            agent {
-                docker {
-                    image 'gradle:8.6-jdk21' // Образ с Gradle и JDK 21
-                    args '-u root:root'
-                }
-            }
-            steps {
-                echo 'Hello, Gradle'
-                sh 'chmod +x ./gradlew' // Устанавливаем права на выполнение
-                sh './gradlew clean build -x test'
-            }
-        }
+        // stage('Build') {
+        //     agent {
+        //         docker {
+        //             image 'gradle:8.6-jdk21' // Образ с Gradle и JDK 21
+        //             args '-u root:root'
+        //         }
+        //     }
+        //     steps {
+        //         echo 'Hello, Gradle'
+        //         sh 'chmod +x ./gradlew' // Устанавливаем права на выполнение
+        //         sh './gradlew clean build -x test'
+        //     }
+        // }
         stage('Build Docker Image') {
             agent {
                 docker {
                     image 'docker:latest' // Используем Docker образ
                     args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
+                    // Укажите путь к Dockerfile, который находится в корне проекта
+                    dockerfile {
+                        filename 'Dockerfile'
+                    }
                 }
             }
             steps {
