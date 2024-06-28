@@ -11,7 +11,7 @@ pipeline {
         stage('Build Docker Image') {
             agent {
                 docker {
-                    image 'docker:latest' // Используем Docker образ
+                    image 'docker:latest'
                     args '-u root:root -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
@@ -19,8 +19,7 @@ pipeline {
                 script {
                     def imageName = "dmitryshved/miracles_store:${env.BUILD_ID}"
                     def dockerfile = "Dockerfile"  // Замените на путь к вашему Dockerfile
-                    
-                    // Собираем Docker образ
+                   
                     docker.build(imageName, "-f ${dockerfile} .")
                 }
             }
@@ -31,14 +30,10 @@ pipeline {
             steps {
                 script {
                     def dockerImage = "dmitryshved/miracles_store:${env.BUILD_ID}"
-                    def registryCredentials = 'dockerHub' // Имя ваших Jenkins credentials для Docker Hub
+                    def registryCredentials = 'dockerHub' 
                     
-                    // Аутентификация в Docker Registry
-                    withCredentials([usernamePassword(credentialsId: registryCredentials, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        // Логинимся в Docker Registry
+                    withCredentials([usernamePassword(credentialsId: registryCredentials, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {                    
                         sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
-                        
-                        // Пушим Docker образ в Docker Registry
                         sh "docker push ${dockerImage}"
                     }
                 }
