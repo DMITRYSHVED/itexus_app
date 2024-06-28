@@ -18,7 +18,7 @@ pipeline {
             steps {
                 script {
                     def imageName = "dmitryshved/miracles_store:${env.BUILD_ID}"
-                    def dockerfile = "Dockerfile"  // Замените на путь к вашему Dockerfile
+                    def dockerfile = "Dockerfile" 
                    
                     docker.build(imageName, "-f ${dockerfile} .")
                 }
