@@ -25,6 +25,25 @@ pipeline {
                 }
             }
         }
+
+        stage('Push Docker Image') {
+            agent any
+            steps {
+                script {
+                    def dockerImage = "dmitryshved/miracles_store:${env.BUILD_ID}"
+                    def registryCredentials = 'dockerhub_credentials' // Имя ваших Jenkins credentials для Docker Hub
+                    
+                    // Аутентификация в Docker Registry
+                    withCredentials([usernamePassword(credentialsId: dockerHub, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        // Логинимся в Docker Registry
+                        sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                        
+                        // Пушим Docker образ в Docker Registry
+                        sh "docker push ${dockerImage}"
+                    }
+                }
+            }
+        }
     }
 }
 
